@@ -1,29 +1,62 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tree-sitter-move-on-aptos"
-description = "MoveOnAptos grammar for tree-sitter"
-version = "0.0.1"
-keywords = ["incremental", "parsing", "tree-sitter", "move-on-aptos"]
-classifiers = [
-  "Intended Audience :: Developers",
-  "License :: OSI Approved :: Apache Software License",
-  "Topic :: Software Development :: Compilers",
-  "Topic :: Text Processing :: Linguistic",
-  "Typing :: Typed"
-]
-requires-python = ">=3.8"
-license = {file = "LICENSE"}
+name = "aptos-move-analyzer"
+version = "1.0.0"
+description = "A Python library for indexing and querying Aptos Move projects"
 readme = "README.md"
-
-[project.urls]
-Homepage = "https://github.com/tree-sitter/tree-sitter-move-on-aptos"
+requires-python = ">=3.8"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "ArArgon", email = "liaozping@gmail.com"}
+]
+keywords = ["aptos", "move", "blockchain", "indexer", "analyzer"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "tree-sitter>=0.20.0",
+]
 
 [project.optional-dependencies]
-core = ["tree-sitter~=0.21"]
+dev = [
+    "pytest>=7.0.0",
+    "black>=22.0.0",
+    "mypy>=0.950",
+]
 
-[tool.cibuildwheel]
-build = "cp38-*"
-build-frontend = "build"
+[project.scripts]
+aptos-move-analyzer = "aptos_move_analyzer.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/yourusername/tree-sitter-move-on-aptos"
+Documentation = "https://github.com/yourusername/tree-sitter-move-on-aptos/blob/main/README.md"
+Repository = "https://github.com/yourusername/tree-sitter-move-on-aptos"
+Issues = "https://github.com/yourusername/tree-sitter-move-on-aptos/issues"
+
+[tool.black]
+line-length = 100
+target-version = ['py38', 'py39', 'py310', 'py311']
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]

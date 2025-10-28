@@ -4,6 +4,9 @@
   "description": "A tree sitter parser for move language (Aptos).",
   "main": "index.js",
   "types": "bindings/node",
+  "bin": {
+    "aptos-indexer": "./dist/src/cli.js"
+  },
   "scripts": {
     "test": "tree-sitter test",
     "parse": "tree-sitter parse",
@@ -11,7 +14,9 @@
     "install": "node-gyp-build",
     "prebuildify": "prebuildify --napi --strip",
     "format": "eslint --fix grammar.js",
-    "format:check": "eslint grammar.js"
+    "format:check": "eslint grammar.js",
+    "build:indexer": "tsc",
+    "indexer": "npm run build:indexer && node dist/src/cli.js"
   },
   "author": "ArArgon <liaozping@gmail.com>",
   "license": "Apache-2.0",
@@ -28,12 +33,14 @@
     }
   },
   "devDependencies": {
+    "@types/node": "^24.9.1",
     "eslint": "^9.9.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
     "globals": "^15.9.0",
     "prebuildify": "^6.0.1",
-    "tree-sitter-cli": "^0.22.6"
+    "tree-sitter-cli": "^0.22.6",
+    "typescript": "^5.9.3"
   },
   "files": [
     "grammar.js",

@@ -18,9 +18,19 @@ _obj/
 
 # Python artifacts
 .venv/
+venv/
+env/
 dist/
+build/
 *.egg-info
 *.whl
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
 
 # C artifacts
 *.a
@@ -46,3 +56,6 @@ log.html
 
 # testing repos
 test/repos/
+
+#kiro
+.kiro/

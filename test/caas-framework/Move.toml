@@ -1,0 +1,19 @@
+[package]
+name = "caas_framework"
+version = "1.0.0"
+authors = []
+
+[addresses]
+caas_framework = "0x92af222254470faeda82d447067ce14b38ceafedb4c7ea462bf6b1e98cecf1f8"
+caas_admin = "0xa85343198e083811798786d0ba9f9f594830fd057c13897391a81225d8ab0bf4"
+
+[dev-addresses]
+caas_framework = "0xd"
+caas_admin = "0xe"
+
+[dependencies.AptosFramework]
+git = "https://github.com/aptos-labs/aptos-framework.git"
+rev = "mainnet"
+subdir = "aptos-framework"
+
+[dev-dependencies]
