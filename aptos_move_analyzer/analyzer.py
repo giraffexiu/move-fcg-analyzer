@@ -1,9 +1,7 @@
-"""
-Simple analyzer wrapper for querying a single function and returning JSON.
-"""
-
-from .indexer import ProjectIndexer
-from .query_engine import FunctionQueryEngine
+import json
+import subprocess
+import os
+from pathlib import Path
 
 
 class MoveFunctionAnalyzer:
@@ -15,11 +13,52 @@ class MoveFunctionAnalyzer:
     """
 
     def __init__(self):
-        self._indexer = ProjectIndexer()
-        self._engine = FunctionQueryEngine()
+        # Find the CLI path (TypeScript implementation)
+        # The cli.js is in the project root's dist/src/ directory
+        project_root = Path(__file__).parent.parent
+        self._cli_path = project_root / "dist" / "src" / "cli.js"
+        
+        if not self._cli_path.exists():
+            # Try to build it
+            self._build_indexer(project_root)
+
+    def _build_indexer(self, project_root):
+        """Build the TypeScript indexer if not already built"""
+        try:
+            # Run npm run build:indexer
+            subprocess.run(
+                ["npm", "run", "build:indexer"],
+                cwd=project_root,
+                check=True,
+                capture_output=True,
+                text=True
+            )
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError(f"Failed to build TypeScript indexer: {e.stderr}")
+        except FileNotFoundError:
+            raise RuntimeError("npm not found. Please install Node.js and npm.")
 
     def analyze_raw(self, project_path: str, function_name: str):
         """Index the project and query a function, returning JSON dict or None."""
-        index = self._indexer.index_project(project_path)
-        result = self._engine.query_function(index, function_name)
-        return result.to_json() if result else None
+        try:
+            # Call the TypeScript CLI
+            result = subprocess.run(
+                ["node", str(self._cli_path), project_path, function_name],
+                capture_output=True,
+                text=True,
+                check=False
+            )
+            
+            if result.returncode != 0:
+                # Function not found or error occurred
+                return None
+            
+            # Parse the JSON output
+            return json.loads(result.stdout)
+            
+        except json.JSONDecodeError:
+            # Invalid JSON output
+            return None
+        except Exception as e:
+            print(f"Error calling TypeScript indexer: {e}")
+            return None
