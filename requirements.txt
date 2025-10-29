@@ -1,9 +1,1 @@
-# Aptos Move Analyzer - Python Requirements
-
-# Core dependencies
 tree-sitter>=0.20.0
-
-# Development dependencies (optional)
-pytest>=7.0.0
-black>=22.0.0
-mypy>=0.950

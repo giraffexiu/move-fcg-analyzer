@@ -11,15 +11,19 @@ Semgrep integration, Move Tree-sitter grammar, and Aptos Move Analyzer
 ### 快速安装
 
 ```bash
-# 1. 安装 Python 依赖和构建 tree-sitter 绑定
+# 安装运行依赖
 pip install -r requirements.txt
+
+# 以可编辑模式安装 Python 库（轻量打包）
 pip install -e .
 
-# 2. 验证安装
+# 验证安装
 python verify_installation.py
 ```
 
-**注意**: `pip install -e .` 会同时构建 tree-sitter Move 的 Python 绑定（C 扩展）和安装 aptos-move-analyzer 包。
+**注意**:
+- 本库不再强制依赖预编译的 Python 绑定；首次运行时会自动使用 `tree-sitter` 从本仓库源码本地编译并加载 Move 语言（需要可用的 C 编译环境）。
+- macOS 请确保安装了 Xcode Command Line Tools；Linux 请安装 `build-essential` 或等价工具；Windows 需安装 Visual Studio Build Tools。
 
 ### 快速使用
 
@@ -311,9 +315,9 @@ tests/
 
 ### 常见问题
 
-**Q: 提示 "Tree-sitter Move language binding not found"？**
+**Q: 首次使用失败，提示无法加载 Move 语言？**
 
-A: 确保已运行 `npm install` 构建 tree-sitter 绑定。
+A: 请确认已安装 `tree-sitter`，并且本机具备 C 编译环境（见上面的注意事项）。
 
 **Q: 如何查询模块限定的函数？**
 

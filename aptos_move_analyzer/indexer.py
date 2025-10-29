@@ -30,20 +30,30 @@ class ProjectIndexer:
                           If None, will try to use the Python binding
         """
         try:
-            # Try to import the Python binding
+            # 优先尝试使用已安装的 Python 绑定
             import tree_sitter_move_on_aptos
-            
-            self.language = Language(tree_sitter_move_on_aptos.language(), "move_aptos")
+
+            self.language = Language(tree_sitter_move_on_aptos.language(), "move_on_aptos")
             self.parser = Parser()
             self.parser.set_language(self.language)
         except ImportError:
-            raise RuntimeError(
-                "Tree-sitter Move language binding not found. "
-                "Please install the Python binding first:\n"
-                "  pip install ./bindings/python\n"
-                "Or build from source:\n"
-                "  cd bindings/python && pip install -e ."
-            )
+            # 绑定缺失时，回退到本地源码编译并加载
+            project_root = Path(__file__).resolve().parent.parent
+            build_dir = project_root / "build"
+            build_dir.mkdir(parents=True, exist_ok=True)
+            output_lib = build_dir / "move_aptos.so"
+
+            # 如果不存在已编译库，则进行编译
+            if not output_lib.exists():
+                Language.build_library(
+                    str(output_lib),
+                    [str(project_root)]  # 该目录下包含 src/parser.c 与 src/scanner.c
+                )
+
+            # 从本地编译库加载语言
+            self.language = Language(str(output_lib), "move_on_aptos")
+            self.parser = Parser()
+            self.parser.set_language(self.language)
 
     def index_project(self, project_path: str) -> ProjectIndex:
         """
@@ -184,16 +194,16 @@ class ProjectIndexer:
     def _extract_modules(self, root_node, file_path: str, source_code: str) -> List[ModuleInfo]:
         """Extract module information from AST"""
         modules = []
-        
+
         def traverse(node):
-            if node.type == 'module_definition':
+            if node.type == 'module':
                 module_info = self._parse_module(node, file_path, source_code)
                 if module_info:
                     modules.append(module_info)
-            
+
             for child in node.children:
                 traverse(child)
-        
+
         traverse(root_node)
         return modules
 
@@ -223,69 +233,87 @@ class ProjectIndexer:
         functions = []
         current_module = ''
         current_address = ''
-        
+
         def traverse(node, module_name='', module_addr=''):
             nonlocal current_module, current_address
-            
-            if node.type == 'module_definition':
-                # Update current module context
+
+            if node.type == 'module':
+                # Extract module name/address from header before '{'
+                header_identifiers = []
                 for child in node.children:
-                    if child.type == 'module_identity':
-                        identifiers = [c for c in child.children if c.type == 'identifier']
-                        if len(identifiers) >= 2:
-                            current_address = source_code[identifiers[0].start_byte:identifiers[0].end_byte]
-                            current_module = source_code[identifiers[1].start_byte:identifiers[1].end_byte]
-                        elif len(identifiers) == 1:
-                            current_module = source_code[identifiers[0].start_byte:identifiers[0].end_byte]
-            
-            if node.type == 'function_definition':
+                    # Stop collecting at the module body start
+                    if getattr(child, 'type', '') == '{':
+                        break
+                    if child.type == 'identifier':
+                        header_identifiers.append(child)
+
+                if len(header_identifiers) >= 2:
+                    current_address = source_code[header_identifiers[0].start_byte:header_identifiers[0].end_byte]
+                    current_module = source_code[header_identifiers[1].start_byte:header_identifiers[1].end_byte]
+                elif len(header_identifiers) == 1:
+                    current_module = source_code[header_identifiers[0].start_byte:header_identifiers[0].end_byte]
+
+            if node.type == 'function_decl':
                 func_info = self._parse_function(node, file_path, source_code, current_module, current_address)
                 if func_info:
                     functions.append(func_info)
-            
+
             for child in node.children:
                 traverse(child, current_module, current_address)
-        
+
         traverse(root_node)
         return functions
 
     def _parse_function(self, node, file_path: str, source_code: str, module_name: str, module_address: str) -> FunctionInfo:
-        """Parse a function definition node"""
+        """Parse a function declaration node"""
         func_name = ''
         parameters = []
         return_type = None
         visibility = 'private'
         modifiers = []
-        
+
         # Extract function name
         for child in node.children:
             if child.type == 'identifier':
                 func_name = source_code[child.start_byte:child.end_byte]
                 break
-        
-        # Extract visibility and modifiers
-        for child in node.children:
-            if child.type in ['public', 'entry', 'inline', 'native']:
-                if child.type == 'public':
-                    visibility = 'public'
-                else:
-                    modifiers.append(child.type)
-        
+
         # Extract parameters
         for child in node.children:
-            if child.type == 'function_parameters':
+            if child.type == 'parameters':
                 parameters = self._parse_parameters(child, source_code)
-        
-        # Extract return type
+
+        # Extract return type (if present)
         for child in node.children:
-            if child.type == 'ret_type':
+            if child.type == 'type':
                 return_type = source_code[child.start_byte:child.end_byte].strip()
-        
+                break
+
+        # Try to determine visibility/modifiers by scanning siblings
+        prev = getattr(node, 'prev_sibling', None)
+        while prev is not None:
+            t = prev.type
+            if t == 'visibility':
+                # visibility node contains 'public' or 'public(friend/package)'
+                text = source_code[prev.start_byte:prev.end_byte]
+                if 'public' in text:
+                    visibility = 'public'
+                    if '(friend)' in text:
+                        visibility = 'public(friend)'
+                    elif '(package)' in text:
+                        visibility = 'public(package)'
+            elif t in ['entry', 'native', 'inline']:
+                modifiers.append(t)
+            else:
+                # Stop at unrelated nodes
+                pass
+            prev = prev.prev_sibling
+
         # Get source code
         func_source = source_code[node.start_byte:node.end_byte]
         start_line = source_code[:node.start_byte].count('\n') + 1
         end_line = source_code[:node.end_byte].count('\n') + 1
-        
+
         return FunctionInfo(
             name=func_name,
             module_name=module_name,
@@ -303,19 +331,19 @@ class ProjectIndexer:
     def _parse_parameters(self, params_node, source_code: str) -> List[ParameterInfo]:
         """Parse function parameters"""
         parameters = []
-        
+
         for child in params_node.children:
-            if child.type == 'function_parameter':
+            if child.type == 'parameter':
                 param_name = ''
                 param_type = ''
-                
+
                 for param_child in child.children:
                     if param_child.type == 'identifier':
                         param_name = source_code[param_child.start_byte:param_child.end_byte]
                     elif param_child.type in ['type', 'primitive_type', 'apply_type']:
                         param_type = source_code[param_child.start_byte:param_child.end_byte]
-                
+
                 if param_name:
                     parameters.append(ParameterInfo(name=param_name, type=param_type))
-        
+
         return parameters
