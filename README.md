@@ -1,451 +1,144 @@
 # Tree-sitter Move on Aptos
 
-Semgrep integration, Move Tree-sitter grammar, and Aptos Move Analyzer
+简体中文 | English
 
----
+——
 
-## 🐍 Aptos Move Analyzer - Python Library
+简述：本仓库包含 Move 语言的 Tree‑sitter 语法与一个轻量的 Python 库 Aptos Move Analyzer，可对 Aptos Move 项目进行索引与函数查询，并以 JSON 输出结果。
 
-**一个用于索引和查询 Aptos Move 项目的 Python 库**
+Brief: This repo provides a Tree‑sitter grammar for Move and a lightweight Python library, Aptos Move Analyzer, to index and query Aptos Move projects with JSON output.
 
-### 快速安装
+—
+
+## 🐍 Aptos Move Analyzer（Python 库）/ Python Library
+
+### 快速安装 / Quick Install
 
 ```bash
-# 安装运行依赖
-pip install -r requirements.txt
-
-# 以可编辑模式安装 Python 库（轻量打包）
+# 建议在虚拟环境中 / In a virtualenv
+python -m venv .venv && source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install -U pip
 pip install -e .
 
-# 验证安装
-python verify_installation.py
+# 可选验证 / Optional verify
+python -c "import aptos_move_analyzer as m; print(m.__version__)"
 ```
 
-**注意**:
-- 本库不再强制依赖预编译的 Python 绑定；首次运行时会自动使用 `tree-sitter` 从本仓库源码本地编译并加载 Move 语言（需要可用的 C 编译环境）。
-- macOS 请确保安装了 Xcode Command Line Tools；Linux 请安装 `build-essential` 或等价工具；Windows 需安装 Visual Studio Build Tools。
+要点 / Notes:
+- 无需预编译绑定：首次使用会通过 `tree-sitter` 从本仓库 `src/` 自动编译并加载 Move 语言（需要 C/C++ 构建工具）。
+- Ensure build tools: macOS（Xcode CLT）、Linux（build‑essential 或等价）、Windows（推荐 WSL2，或安装 Visual Studio Build Tools）。
 
-### 快速使用
-
-**Python 库：**
+### 最简用法 / Minimal Usage
 
 ```python
-from aptos_move_analyzer import ProjectIndexer, FunctionQueryEngine
-
-# 创建索引器和查询引擎
-indexer = ProjectIndexer()
-query_engine = FunctionQueryEngine()
-
-# 索引项目
-index = indexer.index_project("./test/caas-framework")
-
-# 查询函数
-result = query_engine.query_function(index, "grant_read_authorization")
-
-if result:
-    print(f"函数: {result.function_info.name}")
-    print(f"模块: {result.function_info.module_name}")
-    print(f"参数: {len(result.function_info.parameters)}")
-    
-    # 转换为 JSON
-    json_output = result.to_json()
-```
-
-**命令行工具：**
-
-```bash
-# 查询函数
-aptos-move-analyzer ./test/caas-framework grant_read_authorization
-
-# JSON 格式输出
-aptos-move-analyzer ./test/caas-framework grant_read_authorization --json
-
-# 查看帮助
-aptos-move-analyzer --help
-```
-
-### 主要功能
-
-#### ProjectIndexer - 项目索引器
-
-```python
-indexer = ProjectIndexer()
-
-# 索引项目
-index = indexer.index_project("./my-project")
-
-# 查看索引信息
-print(f"包名: {index.package_name}")
-print(f"模块数: {len(index.modules)}")
-print(f"函数数: {sum(len(funcs) for funcs in index.functions.values())}")
-```
-
-#### FunctionQueryEngine - 函数查询引擎
-
-```python
-query_engine = FunctionQueryEngine()
-
-# 查询简单函数名
-result = query_engine.query_function(index, "transfer")
-
-# 查询模块限定的函数名
-result = query_engine.query_function(index, "coin::transfer")
-
-# 查询模块中的所有函数
-functions = query_engine.query_module_functions(index, "coin")
-```
-
-#### 数据类型
-
-- **FunctionInfo** - 函数详细信息（名称、参数、返回类型、可见性、源代码等）
-- **ModuleInfo** - 模块信息
-- **ProjectIndex** - 项目索引
-- **QueryResult** - 查询结果（包含函数信息和调用关系）
-- **ParameterInfo** - 参数信息
-- **CallInfo** - 函数调用信息
-
-### API 文档
-
-#### ProjectIndexer
-
-```python
-class ProjectIndexer:
-    def __init__(self, language_path: str = None):
-        """
-        初始化项目索引器
-        
-        Args:
-            language_path: tree-sitter Move 语言绑定路径（可选）
-        """
-    
-    def index_project(self, project_path: str) -> ProjectIndex:
-        """
-        索引 Aptos Move 项目
-        
-        Args:
-            project_path: 项目根目录路径
-            
-        Returns:
-            ProjectIndex: 包含所有模块和函数的项目索引
-        """
-```
-
-#### FunctionQueryEngine
-
-```python
-class FunctionQueryEngine:
-    def query_function(self, index: ProjectIndex, function_name: str) -> Optional[QueryResult]:
-        """
-        查询函数
-        
-        Args:
-            index: 项目索引
-            function_name: 函数名或模块限定名（如 "module::function"）
-            
-        Returns:
-            QueryResult: 查询结果，未找到则返回 None
-        """
-    
-    def query_module_functions(self, index: ProjectIndex, module_name: str) -> List[FunctionInfo]:
-        """
-        查询模块中的所有函数
-        
-        Args:
-            index: 项目索引
-            module_name: 模块名
-            
-        Returns:
-            List[FunctionInfo]: 函数信息列表
-        """
-```
-
-#### QueryResult
-
-```python
-@dataclass
-class QueryResult:
-    function_info: FunctionInfo  # 函数信息
-    calls: List[CallInfo]        # 函数调用列表
-    
-    def to_json(self) -> dict:
-        """转换为 JSON 格式"""
-```
-
-### 使用示例
-
-#### 示例 1: 列出项目中的所有函数
-
-```python
-from aptos_move_analyzer import ProjectIndexer
-
-indexer = ProjectIndexer()
-index = indexer.index_project("./my-project")
-
-print("项目中的所有函数:")
-for func_name, func_list in index.functions.items():
-    for func in func_list:
-        print(f"  - {func.module_name}::{func.name}")
-```
-
-#### 示例 2: 查找特定模块的公共函数
-
-```python
-from aptos_move_analyzer import ProjectIndexer, FunctionQueryEngine
-
-indexer = ProjectIndexer()
-query_engine = FunctionQueryEngine()
-
-index = indexer.index_project("./my-project")
-functions = query_engine.query_module_functions(index, "my_module")
-
-print("公共函数:")
-for func in functions:
-    if func.visibility == "public":
-        print(f"  - {func.name}")
-        print(f"    参数: {[f'{p.name}: {p.type}' for p in func.parameters]}")
-```
-
-#### 示例 3: 分析函数调用关系
-
-```python
-from aptos_move_analyzer import ProjectIndexer, FunctionQueryEngine
-
-indexer = ProjectIndexer()
-query_engine = FunctionQueryEngine()
-
-index = indexer.index_project("./my-project")
-result = query_engine.query_function(index, "my_function")
-
-if result:
-    print(f"函数 {result.function_info.name} 调用了:")
-    for call in result.calls:
-        print(f"  - {call.called_function} (类型: {call.call_type})")
-        if call.called_file_path:
-            print(f"    位置: {call.called_file_path}")
-```
-
-#### 示例 4: 导出为 JSON
-
-```python
+from aptos_move_analyzer import MoveFunctionAnalyzer
 import json
+
+analyzer = MoveFunctionAnalyzer()
+data = analyzer.analyze_raw("./test/caas-framework", "label::get_address_labels")
+print(json.dumps(data if data is not None else None, ensure_ascii=False))
+```
+
+命令行 / CLI:
+
+```bash
+aptos-move-analyzer <project_path> <function_name> --json
+# 示例 / Example
+aptos-move-analyzer ./test/caas-framework label::get_address_labels --json
+```
+
+### 语言加载机制 / How Language Loads
+
+加载顺序 / Order:
+1) 尝试导入 Python 绑定 `tree_sitter_move_on_aptos.language()`；
+2) 失败则回退为本地编译：使用 `tree_sitter.Language.build_library` 从 `src/` 生成并加载共享库（默认写入 `build/move_aptos.so`）。
+
+Windows 原生环境可能无法加载 `.so`，建议优先使用 WSL2；或自行生成平台对应后缀（如 `.dll`）并调整加载路径。
+
+—
+
+## 🛠️ 从源码构建（Linux/macOS/Windows）/ Build from Source
+
+1) 克隆 / Clone
+
+```bash
+git clone https://github.com/aptos-labs/tree-sitter-move-on-aptos.git
+cd tree-sitter-move-on-aptos
+```
+
+2) 准备环境 / Prepare
+
+- Python 3.8+，推荐虚拟环境；Install in venv.
+- 安装本库 / Install the library: `pip install -e .`（自动安装 `tree-sitter`）。
+- 安装系统构建工具 / Install system toolchain：
+  - macOS: `xcode-select --install`
+  - Ubuntu/Debian: `sudo apt-get update && sudo apt-get install -y build-essential`
+  - Fedora/CentOS: `sudo dnf/yum install -y gcc make`
+  - Windows: 推荐 WSL2；原生需 Visual Studio Build Tools。
+
+3) 首次运行自动编译 / First Run Auto‑Compile
+
+首次调用 `ProjectIndexer()` 且未发现 Python 绑定时，将自动从 `src/` 编译共享库并加载。Windows 原生若加载失败，优先在 WSL2 运行。
+
+—
+
+## 🚀 更细粒度用法 / Granular Usage
+
+```python
 from aptos_move_analyzer import ProjectIndexer, FunctionQueryEngine
+import json
 
 indexer = ProjectIndexer()
-query_engine = FunctionQueryEngine()
-
-index = indexer.index_project("./my-project")
-result = query_engine.query_function(index, "my_function")
+engine = FunctionQueryEngine()
+index = indexer.index_project("./test/caas-framework")
+result = engine.query_function(index, "label::get_address_labels")
 
 if result:
-    json_output = result.to_json()
-    print(json.dumps(json_output, indent=2, ensure_ascii=False))
+    print(json.dumps(result.to_json(), indent=2, ensure_ascii=False))
 ```
 
-### 运行示例代码
+仅输出 JSON 的测试脚本 / JSON‑only test script:
 
-项目包含三个完整的示例：
+编辑仓库根目录 `test.py` 内的变量并运行 / Edit variables in `test.py` and run:
+
+```python
+project_path = "test/caas-framework"
+function_name = "label::get_address_labels"
+```
 
 ```bash
-# 基本使用示例
-python examples/basic_usage.py
-
-# JSON 输出示例
-python examples/json_output.py
-
-# 批量查询示例
-python examples/batch_query.py
+python3 test.py
 ```
 
-### 开发
+输出字段 / Output fields：`contract`、`function`、`source`、`location`（文件与起止行）、`parameter`。`calls` 当前为占位，后续逐步完善。
 
-#### 运行测试
+—
 
-```bash
-pytest tests/
-```
+## ❓ 常见问题 / Troubleshooting
 
-#### 代码格式化
+- ImportError 找不到绑定 / Missing binding：属正常回退路径；若编译失败，请确认 C/C++ 工具是否安装。
+- Windows 加载 `.so` 失败 / Cannot load `.so` on Windows：建议使用 WSL2，或编译 `.dll` 并调整路径。
+- Move.toml 解析告警 / Move.toml parse warnings：非致命，索引仍会继续。
+- 仅输出 JSON / JSON‑only: 参考 `test.py` 中对 stdout 的抑制逻辑。
 
-```bash
-black aptos_move_analyzer/ tests/ examples/
-```
+—
 
-#### 类型检查
-
-```bash
-mypy aptos_move_analyzer/
-```
-
-
-
-### 项目结构
+## 📁 项目结构（精简）/ Slim Project Layout
 
 ```
 aptos_move_analyzer/
-├── __init__.py           # 包初始化，导出主要接口
-├── __main__.py           # 支持 python -m aptos_move_analyzer 运行
-├── types.py              # 数据类型定义
-├── indexer.py            # 项目索引器
-├── query_engine.py       # 函数查询引擎
-├── call_extractor.py     # 函数调用提取器
-├── cli.py                # 命令行接口
-└── py.typed              # 类型检查支持
+  analyzer.py      # 单函数查询并返回 JSON / Minimal analyzer wrapper
+  indexer.py       # 索引器与语言加载 / Indexer and language loading
+  query_engine.py  # 查询引擎 / Query engine
+  call_extractor.py# 调用提取（精简）/ Call extractor (minimal)
+  types.py         # 类型与序列化 / Types and JSON
 
-examples/
-├── basic_usage.py        # 基本使用示例
-├── json_output.py        # JSON 输出示例
-└── batch_query.py        # 批量查询示例
-
-tests/
-└── test_indexer.py       # 单元测试和集成测试
+test.py            # JSON-only 示例 / JSON-only example
+grammar.js, src/   # Tree-sitter 语法与生成代码 / Grammar & generated
 ```
 
-### 依赖项
+—
 
-- **运行时依赖**: `tree-sitter>=0.20.0`
-- **开发依赖**: `pytest>=7.0.0`, `black>=22.0.0`, `mypy>=0.950`
-
-### 支持的 Python 版本
-
-- Python 3.8+
-- Python 3.9+
-- Python 3.10+
-- Python 3.11+
-- Python 3.12+
-
-### 常见问题
-
-**Q: 首次使用失败，提示无法加载 Move 语言？**
-
-A: 请确认已安装 `tree-sitter`，并且本机具备 C 编译环境（见上面的注意事项）。
-
-**Q: 如何查询模块限定的函数？**
-
-A: 使用 `module::function` 格式：
-```python
-result = query_engine.query_function(index, "coin::transfer")
-```
-
-**Q: 如何获取函数的源代码？**
-
-A: 
-```python
-result = query_engine.query_function(index, "my_function")
-print(result.function_info.source_code)
-```
-
----
-
-## 🌳 Tree-sitter Grammar
-
-### Project Structure
-
-Most files within this repo are auto-generated by `tree-sitter`. The only files you need to care about:
-
-- `grammar.js`: the main grammar rules for move programming language
-- `src/scanner.c`: the external scanner used in `grammar.js`
-- `batch-test.py`: a Python script for testing the grammar
-- `.github/workflows/test-on-repo.yaml`: GitHub Workflow configurations
-
-### Setting up the Environment
-
-Before contributing to the grammar rules, install and configure `tree-sitter`:
-
-1. Install Node.js (recommended: use a version manager)
-2. Install a working C compiler (macOS: Xcode Command Line Tools)
-3. Install `tree-sitter` via `cargo` or `npm`
-4. (Optional) Install Rust compiler and Cargo
-5. Install Python for batch testing
-
-Initialize tree-sitter:
-
-```bash
-tree-sitter init-config
-```
-
-### Writing the Rules
-
-To learn how to write tree-sitter grammar DSL, see:
-
-- https://tree-sitter.github.io/tree-sitter/creating-parsers#the-grammar-dsl
-- https://tree-sitter.github.io/tree-sitter/creating-parsers#writing-the-grammar
-
-Reference sources:
-
-1. https://github.com/tree-sitter/tree-sitter-rust - Rust's tree-sitter grammars
-2. https://github.com/tree-sitter/tree-sitter-javascript - JavaScript's tree-sitter grammars
-3. [Move parser syntax.rs](https://github.com/aptos-labs/aptos-core/blob/main/third_party/move/move-compiler/src/parser/syntax.rs) - Move's official parser
-
-After coding:
-
-```bash
-npm run format           # Format code
-tree-sitter generate     # Generate parser
-```
-
-### Testing the Grammar
-
-Test on individual files:
-
-```bash
-tree-sitter parse ${MOVE_FILE}
-```
-
-Useful flags:
-- `-d`: show parsing debug log
-- `-D`: produce log.html with debugging graphs
-
-Batch testing:
-
-```bash
-python3 batch-test.py <PATH> [<PATH> ...]
-```
-
-### Submitting Code
-
-Before committing:
-
-```bash
-npm run format
-tree-sitter generate
-```
-
-Remember to include all updated generated code in your commit.
-
----
-
-## 📦 TypeScript Indexer
-
-The TypeScript-based function indexer tool is located in the `indexer/` directory.
-
-### Setup
-
-```bash
-npm install
-npm run build:indexer
-```
-
-### Usage
-
-See `indexer/README.md` for detailed documentation.
-
----
-
-## 📄 License
+## 📜 许可 / License
 
 Apache License 2.0
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📧 Contact
-
-- Author: ArArgon
-- Email: liaozping@gmail.com
-
-## 🙏 Acknowledgments
-
-- Tree-sitter team
-- Aptos team
-- All contributors
