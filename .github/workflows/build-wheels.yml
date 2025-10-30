@@ -7,68 +7,84 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_wheel:
-    name: Build universal wheel
-    runs-on: ubuntu-latest
-    
+  build_wheels:
+    name: Build wheel on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-      
-      - name: Build TypeScript (JS files only, no platform-specific bindings)
+
+      - name: Install build tools (Linux)
+        if: startsWith(matrix.os, 'ubuntu')
         run: |
-          npm install
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3-dev
+
+      - name: Build TypeScript and native addon
+        run: |
+          npm ci
           npm run build:indexer
-          cp -r dist move_fcg_analyzer/
-      
+          node -e "const fs=require('fs');const path=require('path');const src='dist';const dst=path.join('move_fcg_analyzer','dist');fs.rmSync(dst,{recursive:true,force:true});fs.mkdirSync(dst,{recursive:true});fs.cpSync(src,dst,{recursive:true});const nodeSrc=path.join('build','Release','tree_sitter_move_binding.node');const nodeDstDir=path.join('move_fcg_analyzer','build','Release');if(fs.existsSync(nodeSrc)){fs.mkdirSync(nodeDstDir,{recursive:true});fs.copyFileSync(nodeSrc,path.join(nodeDstDir,'tree_sitter_move_binding.node'));}"
+
       - name: Build wheel
         run: |
+          python -m pip install --upgrade pip
           python -m pip install build
           python -m build --wheel
-      
-      - name: Upload wheel
+
+      - name: Upload wheel artifact
         uses: actions/upload-artifact@v4
         with:
-          name: wheel
+          name: wheel-${{ matrix.os }}
           path: ./dist/*.whl
 
   build_sdist:
-    name: Build source distribution
+    name: Build source distribution (Linux)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-      
-      - name: Build TypeScript
+
+      - name: Install build tools
         run: |
-          npm install
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3-dev
+
+      - name: Build TypeScript and include in package
+        run: |
+          npm ci
           npm run build:indexer
-          cp -r dist move_fcg_analyzer/
-      
+          node -e "const fs=require('fs');const path=require('path');const src='dist';const dst=path.join('move_fcg_analyzer','dist');fs.rmSync(dst,{recursive:true,force:true});fs.mkdirSync(dst,{recursive:true});fs.cpSync(src,dst,{recursive:true});const nodeSrc=path.join('build','Release','tree_sitter_move_binding.node');const nodeDstDir=path.join('move_fcg_analyzer','build','Release');if(fs.existsSync(nodeSrc)){fs.mkdirSync(nodeDstDir,{recursive:true});fs.copyFileSync(nodeSrc,path.join(nodeDstDir,'tree_sitter_move_binding.node'));}"
+
       - name: Build sdist
         run: |
           python -m pip install build
           python -m build --sdist
-      
-      - name: Upload sdist
+
+      - name: Upload sdist artifact
         uses: actions/upload-artifact@v4
         with:
           name: sdist
@@ -76,17 +92,17 @@ jobs:
 
   publish:
     name: Publish to PyPI
-    needs: [build_wheel, build_sdist]
+    needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
-    
+
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           path: dist
           merge-multiple: true
-      
+
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:

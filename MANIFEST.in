@@ -6,6 +6,7 @@ include package-lock.json
 include binding.gyp
 include tsconfig.json
 recursive-include move_fcg_analyzer/dist *.js *.d.ts *.map
+recursive-include move_fcg_analyzer/build *.node
 recursive-include indexer *.ts *.json
 recursive-include src *.c *.h
 recursive-include bindings/node *.cc *.h
@@ -13,4 +14,3 @@ prune node_modules
 prune .git
 prune build
 prune dist
-prune move_fcg_analyzer/build

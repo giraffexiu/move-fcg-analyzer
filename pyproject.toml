@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "move-fcg-analyzer"
-version = "1.0.5"
+version = "1.06"
 description = "Move language parser and function call graph analyzer"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -46,5 +46,6 @@ move_fcg_analyzer = [
     "py.typed",
     "dist/src/*.js",
     "dist/src/*.d.ts",
-    "dist/src/*.map"
+    "dist/src/*.map",
+    "build/Release/*.node"
 ]
