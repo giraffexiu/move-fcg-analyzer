@@ -1,12 +1,26 @@
 #!/usr/bin/env python3
 import json
+import sys
+import io
+from contextlib import redirect_stdout
+
 from move_fcg_analyzer import MoveFunctionAnalyzer
 
-analyzer = MoveFunctionAnalyzer()
 
-result = analyzer.analyze_raw('./test/deepbook', 'calculate_partial_fill_balances')
+def main():
+    project_path = "./test/deepbook"
+    function_name = "calculate_partial_fill_balances"
 
-if result:
-    print(json.dumps(result, indent=2, ensure_ascii=False))
-else:
-    print("函数未找到或路径错误")
+    try:
+        analyzer = MoveFunctionAnalyzer()
+        raw_data = analyzer.analyze_raw(project_path, function_name)
+        print(json.dumps(raw_data if raw_data is not None else None, indent=2, ensure_ascii=False))
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
