@@ -7,12 +7,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_wheels:
-    name: Build wheels on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+  build_wheel:
+    name: Build universal wheel
+    runs-on: ubuntu-latest
     
     steps:
       - uses: actions/checkout@v4
@@ -27,38 +24,22 @@ jobs:
         with:
           node-version: '18'
       
-      - name: Build Node.js bindings and TypeScript
+      - name: Build TypeScript (JS files only, no platform-specific bindings)
         run: |
           npm install
           npm run build:indexer
           cp -r dist move_fcg_analyzer/
-          mkdir -p move_fcg_analyzer/build/Release
-          cp build/Release/tree_sitter_move_binding.node move_fcg_analyzer/build/Release/ || true
-        shell: bash
       
-      - name: Install cibuildwheel
-        run: python -m pip install cibuildwheel==2.16.2
+      - name: Build wheel
+        run: |
+          python -m pip install build
+          python -m build --wheel
       
-      - name: Build wheels
-        run: python -m cibuildwheel --output-dir wheelhouse
-        env:
-          # Build for Python 3.8-3.12
-          CIBW_BUILD: cp38-* cp39-* cp310-* cp311-* cp312-*
-          # Skip 32-bit builds and musl on Linux
-          CIBW_SKIP: "*-win32 *-manylinux_i686 *-musllinux_*"
-          # Install dependencies
-          CIBW_BEFORE_BUILD: pip install setuptools wheel
-          # Run simple import test after build
-          CIBW_TEST_REQUIRES: tree-sitter
-          CIBW_TEST_COMMAND: python -c "import move_fcg_analyzer; print('Import successful')"
-          # Increase build verbosity to see errors
-          CIBW_BUILD_VERBOSITY: 1
-      
-      - name: Upload wheels
+      - name: Upload wheel
         uses: actions/upload-artifact@v4
         with:
-          name: wheels-${{ matrix.os }}
-          path: ./wheelhouse/*.whl
+          name: wheel
+          path: ./dist/*.whl
 
   build_sdist:
     name: Build source distribution
@@ -76,13 +57,11 @@ jobs:
         with:
           node-version: '18'
       
-      - name: Build Node.js bindings and TypeScript
+      - name: Build TypeScript
         run: |
           npm install
           npm run build:indexer
           cp -r dist move_fcg_analyzer/
-          mkdir -p move_fcg_analyzer/build/Release
-          cp build/Release/tree_sitter_move_binding.node move_fcg_analyzer/build/Release/
       
       - name: Build sdist
         run: |
@@ -97,7 +76,7 @@ jobs:
 
   publish:
     name: Publish to PyPI
-    needs: [build_wheels, build_sdist]
+    needs: [build_wheel, build_sdist]
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     

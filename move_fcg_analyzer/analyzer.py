@@ -41,9 +41,24 @@ class MoveFunctionAnalyzer:
                 self._build_indexer(project_root)
 
     def _build_indexer(self, project_root):
-        """Build the TypeScript indexer if not already built"""
+        """Build the TypeScript indexer and Node.js bindings if not already built"""
         try:
-            # Run npm run build:indexer
+            if self.debug:
+                print(f"[DEBUG] Running npm install in {project_root}")
+            
+            # First run npm install to build Node.js bindings
+            subprocess.run(
+                ["npm", "install"],
+                cwd=project_root,
+                check=True,
+                capture_output=True,
+                text=True
+            )
+            
+            if self.debug:
+                print(f"[DEBUG] Running npm run build:indexer")
+            
+            # Then build TypeScript
             subprocess.run(
                 ["npm", "run", "build:indexer"],
                 cwd=project_root,
@@ -52,7 +67,7 @@ class MoveFunctionAnalyzer:
                 text=True
             )
         except subprocess.CalledProcessError as e:
-            raise RuntimeError(f"Failed to build TypeScript indexer: {e.stderr}")
+            raise RuntimeError(f"Failed to build indexer: {e.stderr}")
         except FileNotFoundError:
             raise RuntimeError("npm not found. Please install Node.js and npm.")
 

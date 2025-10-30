@@ -46,6 +46,5 @@ move_fcg_analyzer = [
     "py.typed",
     "dist/src/*.js",
     "dist/src/*.d.ts",
-    "dist/src/*.map",
-    "build/Release/*.node"
+    "dist/src/*.map"
 ]

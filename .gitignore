@@ -31,9 +31,8 @@ __pycache__/
 .coverage
 htmlcov/
 
-# But include package dist and build
+# But include package dist (not build, it's platform-specific)
 !move_fcg_analyzer/dist/
-!move_fcg_analyzer/build/
 
 # C artifacts
 *.a
