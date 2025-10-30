@@ -1,4 +1,4 @@
-# Aptos Function Indexer | Aptos 函数索引器
+# Move FCG Analyzer - Function Indexer | Move 函数调用图分析器
 
 [English](#english) | [中文](#chinese)
 
@@ -7,7 +7,7 @@
 <a name="english"></a>
 ## English
 
-A TypeScript-based tool for indexing and querying Aptos Move projects.
+A TypeScript-based tool for indexing and querying Move projects with function call graph analysis.
 
 ### Getting Started
 
@@ -85,7 +85,7 @@ npm run indexer <project_path> <function_name>
 
 #### Arguments
 
-- `project_path`: Path to the Aptos Move project directory (must contain Move.toml)
+- `project_path`: Path to the Move project directory (must contain Move.toml)
 - `function_name`: Name of the function to query
   - Simple name: `grant_read_authorization`
   - Module-qualified: `authorization::grant_read_authorization`
@@ -240,7 +240,7 @@ The indexer uses the tree-sitter-move-on-aptos parser from the parent directory 
 <a name="chinese"></a>
 ## 中文
 
-一个基于 TypeScript 的 Aptos Move 项目索引和查询工具。
+一个基于 TypeScript 的 Move 项目索引和函数调用图查询工具。
 
 ### 快速开始
 
@@ -318,7 +318,7 @@ npm run indexer <项目路径> <函数名>
 
 #### 参数说明
 
-- `项目路径`: Aptos Move 项目目录的路径（必须包含 Move.toml）
+- `项目路径`: Move 项目目录的路径（必须包含 Move.toml）
 - `函数名`: 要查询的函数名称
   - 简单名称：`grant_read_authorization`
   - 模块限定名：`authorization::grant_read_authorization`

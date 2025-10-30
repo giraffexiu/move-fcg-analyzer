@@ -20,7 +20,6 @@ _obj/
 .venv/
 venv/
 env/
-dist/
 build/
 *.egg-info
 *.whl

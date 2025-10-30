@@ -1,11 +1,11 @@
 {
-  "name": "tree-sitter-move-on-aptos",
+  "name": "move-fcg-analyzer",
   "version": "1.0.0",
-  "description": "A tree sitter parser for move language (Aptos).",
+  "description": "A tree sitter parser for Move language with function call graph analysis.",
   "main": "index.js",
   "types": "bindings/node",
   "bin": {
-    "aptos-indexer": "./dist/src/cli.js"
+    "move-fcg-analyzer": "./dist/src/cli.js"
   },
   "scripts": {
     "test": "tree-sitter test",
@@ -52,8 +52,8 @@
   ],
   "tree-sitter": [
     {
-      "scope": "source.move_aptos",
-      "injection-regex": "^move_aptos$"
+      "scope": "source.move",
+      "injection-regex": "^move$"
     }
   ]
 }

@@ -36,7 +36,7 @@ function printUsage(): void {
   console.error('Usage: aptos-indexer <project_path> <function_name>');
   console.error('');
   console.error('Arguments:');
-  console.error('  project_path   Path to the Aptos Move project directory');
+  console.error('  project_path   Path to the Move project directory');
   console.error('  function_name  Name of the function to query (supports module::function format)');
   console.error('');
   console.error('Examples:');

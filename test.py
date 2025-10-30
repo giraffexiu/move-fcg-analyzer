@@ -4,7 +4,7 @@ import sys
 import io
 from contextlib import redirect_stdout
 
-from aptos_move_analyzer import MoveFunctionAnalyzer
+from move_fcg_analyzer import MoveFunctionAnalyzer
 
 
 def main():

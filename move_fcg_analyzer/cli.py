@@ -1,5 +1,5 @@
 """
-Command-line interface for Aptos Move Analyzer
+Command-line interface for Move FCG Analyzer
 """
 
 import sys
@@ -11,18 +11,18 @@ from .analyzer import MoveFunctionAnalyzer
 def main():
     """Main CLI function"""
     parser = argparse.ArgumentParser(
-        description="Aptos Move Analyzer - Analyze Aptos Move projects",
+        description="Move FCG Analyzer - Analyze Move projects with function call graph",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  aptos-move-analyzer ./test/caas-framework grant_read_authorization
-  aptos-move-analyzer ./my-project authorization::verify_identity
+  move-fcg-analyzer ./test/caas-framework grant_read_authorization
+  move-fcg-analyzer ./my-project authorization::verify_identity
         """
     )
     
     parser.add_argument(
         "project_path",
-        help="Path to the Aptos Move project directory"
+        help="Path to the Move project directory"
     )
     
     parser.add_argument(
@@ -33,7 +33,7 @@ Examples:
     parser.add_argument(
         "--version",
         action="version",
-        version="aptos-move-analyzer 1.0.0"
+        version="move-fcg-analyzer 1.0.0"
     )
     
     args = parser.parse_args()

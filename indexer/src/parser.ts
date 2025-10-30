@@ -13,8 +13,8 @@ export class MoveParser {
     this.parser = new Parser();
     
     // Load the Move language grammar
-    // The tree-sitter-move-on-aptos parser is built as a native module
-    const languagePath = path.join(__dirname, '../../build/Release/tree_sitter_move_on_aptos_binding.node');
+    // The tree-sitter-move parser is built as a native module
+    const languagePath = path.join(__dirname, '../../build/Release/tree_sitter_move_binding.node');
     
     try {
       // eslint-disable-next-line @typescript-eslint/no-var-requires

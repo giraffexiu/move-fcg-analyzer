@@ -4,7 +4,7 @@ import { MoveParser } from './parser';
 import { ProjectIndex, ModuleInfo, FunctionInfo, DependencyInfo } from './types';
 
 /**
- * ProjectIndexer - Scans and indexes Aptos Move projects
+ * ProjectIndexer - Scans and indexes Move projects
  */
 export class ProjectIndexer {
   private parser: MoveParser;
@@ -14,7 +14,7 @@ export class ProjectIndexer {
   }
 
   /**
-   * Index an Aptos Move project
+   * Index a Move project
    * @param projectPath - Path to the project root directory
    * @returns ProjectIndex containing all modules and functions
    */

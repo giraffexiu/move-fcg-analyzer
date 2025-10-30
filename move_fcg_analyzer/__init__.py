@@ -1,7 +1,7 @@
 """
-Aptos Move Analyzer - Python Library
+Move FCG Analyzer - Python Library
 
-A Python library for analyzing Aptos Move projects.
+A Python library for analyzing Move projects with function call graph analysis.
 This is a lightweight wrapper around the TypeScript indexer.
 """
 

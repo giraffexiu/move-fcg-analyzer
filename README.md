@@ -1,6 +1,6 @@
-# Aptos Move Analyzer
+# Move FCG Analyzer
 
-一个用于分析 Aptos Move 项目的静态分析工具，可以提取函数信息、调用关系、参数等。
+一个用于分析 Move 项目的静态分析工具，支持函数调用图（Function Call Graph）分析，可以提取函数信息、调用关系、参数等。
 
 ## 功能
 
@@ -29,7 +29,7 @@ npm run build:indexer
 ### Python API
 
 ```python
-from aptos_move_analyzer import MoveFunctionAnalyzer
+from move_fcg_analyzer import MoveFunctionAnalyzer
 
 analyzer = MoveFunctionAnalyzer()
 result = analyzer.analyze_raw("./project_path", "function_name")
@@ -41,12 +41,12 @@ print(result["calls"])  # 查看函数调用关系
 ### 命令行
 
 ```bash
-python3 -m aptos_move_analyzer <project_path> <function_name>
+python3 -m move_fcg_analyzer <project_path> <function_name>
 ```
 
 示例：
 ```bash
-python3 -m aptos_move_analyzer ./test/caas-framework grant_read_authorization
+python3 -m move_fcg_analyzer ./test/caas-framework grant_read_authorization
 ```
 
 ## 输出格式

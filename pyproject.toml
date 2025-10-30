@@ -3,9 +3,9 @@ requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "aptos-move-analyzer"
+name = "move-fcg-analyzer"
 version = "1.0.0"
-description = "Aptos Move 项目索引与查询的轻量 Python 库"
+description = "Move 项目索引与函数调用图分析的轻量 Python 库"
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
@@ -13,4 +13,4 @@ dependencies = [
 ]
 
 [project.scripts]
-aptos-move-analyzer = "aptos_move_analyzer.cli:main"
+move-fcg-analyzer = "move_fcg_analyzer.cli:main"

@@ -1,5 +1,5 @@
 """
-Allow running the package as a module: python -m aptos_move_analyzer
+Allow running the package as a module: python -m move_fcg_analyzer
 """
 
 from .cli import main

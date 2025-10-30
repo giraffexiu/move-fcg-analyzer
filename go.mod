@@ -1,4 +1,4 @@
-module github.com/aptos-labs/tree-sitter-move-on-aptos
+module github.com/giraffexiu/move-fcg-analyzer
 
 go 1.22
 
