@@ -67,6 +67,7 @@ jobs:
           CIBW_BUILD_VERBOSITY: 1
           CIBW_MUSLLINUX_X86_64_IMAGE: "musllinux_1_1"
           CIBW_MUSLLINUX_AARCH64_IMAGE: "musllinux_1_1"
+          CIBW_REPAIR_WHEEL_COMMAND_LINUX: ""
       
       - name: Build source distribution (sdist)
         run: |
@@ -135,6 +136,7 @@ jobs:
           CIBW_BUILD: "cp38-* cp39-* cp310-* cp311-* cp312-*"
           CIBW_SKIP: "pp*"
           CIBW_BUILD_VERBOSITY: 1
+          CIBW_REPAIR_WHEEL_COMMAND_MACOS: ""
       
       - name: Upload macOS wheels
         uses: actions/upload-artifact@v4
