@@ -1,0 +1,51 @@
+name: Test Build (Debug)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test_build:
+    name: Test build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build setuptools wheel
+      
+      - name: Try building
+        run: |
+          python -m build --wheel
+        continue-on-error: true
+      
+      - name: Show build output
+        if: always()
+        run: |
+          echo "=== Build directory ==="
+          ls -la build/ || echo "No build directory"
+          echo "=== Dist directory ==="
+          ls -la dist/ || echo "No dist directory"
+      
+      - name: Test import (if wheel exists)
+        if: always()
+        run: |
+          if ls dist/*.whl 1> /dev/null 2>&1; then
+            pip install dist/*.whl
+            python -c "import tree_sitter_move_on_aptos; print('✅ tree_sitter_move_on_aptos OK')"
+            python -c "import move_fcg_analyzer; print('✅ move_fcg_analyzer OK')"
+          else
+            echo "No wheel found, skipping test"
+          fi
+        continue-on-error: true

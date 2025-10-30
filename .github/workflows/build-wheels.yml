@@ -34,9 +34,11 @@ jobs:
           CIBW_SKIP: "*-win32 *-manylinux_i686 *-musllinux_*"
           # Install dependencies
           CIBW_BEFORE_BUILD: pip install setuptools wheel
-          # Run tests after build
-          CIBW_TEST_REQUIRES: pytest tree-sitter
-          CIBW_TEST_COMMAND: python -c "import tree_sitter_move_on_aptos; print('Import successful')"
+          # Run simple import test after build
+          CIBW_TEST_REQUIRES: tree-sitter
+          CIBW_TEST_COMMAND: python -c "import tree_sitter_move_on_aptos; import move_fcg_analyzer; print('✅ Import successful')"
+          # Increase build verbosity to see errors
+          CIBW_BUILD_VERBOSITY: 1
       
       - name: Upload wheels
         uses: actions/upload-artifact@v4

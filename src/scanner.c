@@ -4,6 +4,15 @@
 
 #include "tree_sitter/parser.h"
 
+// Cross-platform attribute macros
+#ifdef _MSC_VER
+#define UNUSED
+#define INLINE __inline
+#else
+#define UNUSED __attribute__((unused))
+#define INLINE inline
+#endif
+
 #ifdef DEBUG
 #define log(...) fprintf(stderr, __VA_ARGS__)
 #else
@@ -33,22 +42,22 @@ void tree_sitter_move_on_aptos_external_scanner_deserialize(void *p, const char 
 
 /// @brief Advance the lexer by one character
 /// @param lexer the lexer
-inline static void advance(TSLexer *lexer) { lexer->advance(lexer, false); }
+static INLINE void advance(TSLexer *lexer) { lexer->advance(lexer, false); }
 
 /// @brief Skip the char, which will be treated as a whitespace character.
 /// @param lexer the lexer
-__attribute__((unused)) inline static void skip(TSLexer *lexer) { lexer->advance(lexer, true); }
+UNUSED static INLINE void skip(TSLexer *lexer) { lexer->advance(lexer, true); }
 
 /// @brief Check if the lookahead marks the end of line. EOF is not considered as EOL.
 /// @param lexer 
 /// @return if it is EOL
-inline static bool is_eol(TSLexer *lexer) {
+static INLINE bool is_eol(TSLexer *lexer) {
   int ch = lexer->lookahead;
   return ch == '\n' || ch == 0x2028 || ch == 0x2029;
 }
 
 
-inline static bool scan_block_doc_comment_marker(TSLexer *lexer) {
+static INLINE bool scan_block_doc_comment_marker(TSLexer *lexer) {
   if (lexer->lookahead != '*') return false;
   // '*' but not '**', '*/'
   advance(lexer);
@@ -62,7 +71,7 @@ inline static bool scan_block_doc_comment_marker(TSLexer *lexer) {
 }
 
 
-inline static bool scan_block_comment_content(TSLexer *lexer) {
+static INLINE bool scan_block_comment_content(TSLexer *lexer) {
   // At this stage, we have already entered a comment block: matched `/*`.
   size_t comment_depth = 1;
 
@@ -108,7 +117,7 @@ inline static bool scan_block_comment_content(TSLexer *lexer) {
 /// @brief Scan a document line, basically `/.*/`.
 /// @param lexer 
 /// @return if matched (always `true`)
-static inline bool scan_line_doc_content(TSLexer *lexer) {
+static INLINE bool scan_line_doc_content(TSLexer *lexer) {
   log("parse line doc comment\n");
   lexer->result_symbol = LINE_DOC_CONTENT;
   while (lexer->lookahead) {
