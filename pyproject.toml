@@ -15,6 +15,13 @@ dependencies = [
 [project.scripts]
 move-fcg-analyzer = "move_fcg_analyzer.cli:main"
 
+[tool.setuptools.packages.find]
+where = [".", "bindings/python"]
+include = ["move_fcg_analyzer*", "tree_sitter_move_on_aptos*"]
+
+[tool.setuptools.package-data]
+tree_sitter_move_on_aptos = ["*.pyi", "py.typed"]
+
 [tool.cibuildwheel]
 # Build for CPython 3.8 through 3.12
 build = "cp38-* cp39-* cp310-* cp311-* cp312-*"

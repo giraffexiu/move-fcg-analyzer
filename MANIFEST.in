@@ -25,7 +25,8 @@ recursive-include indexer *.ts *.json
 recursive-include dist *.js *.d.ts *.map
 
 # Include Python bindings
-recursive-include bindings *.py *.ts
+recursive-include bindings/python/tree_sitter_move_on_aptos *.py *.pyi *.c
+include bindings/python/tree_sitter_move_on_aptos/py.typed
 
 # Exclude unnecessary files
 global-exclude __pycache__

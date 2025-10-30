@@ -4,6 +4,13 @@
 
 #include "tree_sitter/parser.h"
 
+// Define export macro for Windows DLL
+#ifdef _WIN32
+#define TSE_EXPORT __declspec(dllexport)
+#else
+#define TSE_EXPORT
+#endif
+
 #ifdef DEBUG
 #define log(...) fprintf(stderr, __VA_ARGS__)
 #else
@@ -23,13 +30,13 @@ enum TokenType {
 /// Tree-sitter interfaces
 /// Source: https://github.com/tree-sitter/tree-sitter-javascript/blob/master/src/scanner.c
 /// Ref:    https://tree-sitter.github.io/tree-sitter/creating-parsers#external-scanners
-void *tree_sitter_move_on_aptos_external_scanner_create() { return NULL; }
+TSE_EXPORT void *tree_sitter_move_on_aptos_external_scanner_create() { return NULL; }
 
-void tree_sitter_move_on_aptos_external_scanner_destroy(void *p) {}
+TSE_EXPORT void tree_sitter_move_on_aptos_external_scanner_destroy(void *p) {}
 
-unsigned tree_sitter_move_on_aptos_external_scanner_serialize(void *p, char *buffer) { return 0; }
+TSE_EXPORT unsigned tree_sitter_move_on_aptos_external_scanner_serialize(void *p, char *buffer) { return 0; }
 
-void tree_sitter_move_on_aptos_external_scanner_deserialize(void *p, const char *b, unsigned n) {}
+TSE_EXPORT void tree_sitter_move_on_aptos_external_scanner_deserialize(void *p, const char *b, unsigned n) {}
 
 /// @brief Advance the lexer by one character
 /// @param lexer the lexer
@@ -134,7 +141,7 @@ static inline bool scan_line_doc_content(TSLexer *lexer) {
 /// @param lexer 
 /// @param valid_symbols 
 /// @return 
-bool tree_sitter_move_on_aptos_external_scanner_scan(
+TSE_EXPORT bool tree_sitter_move_on_aptos_external_scanner_scan(
   void *payload,
   TSLexer *lexer,
   const bool *valid_symbols

@@ -26,8 +26,9 @@ extra_link_args = []
 
 if sys.platform == 'win32':
     # Windows (MSVC)
+    # MSVC doesn't have /std:c11, use /TC for C compilation
     extra_compile_args = [
-        '/std:c11',
+        '/TC',  # Compile as C code
     ]
 else:
     # Unix-like systems (GCC/Clang)
@@ -43,8 +44,9 @@ else:
 
 # Define the C extension for tree-sitter Move parser
 tree_sitter_move = Extension(
-    name='tree_sitter_move_on_aptos',
+    name='tree_sitter_move_on_aptos._binding',
     sources=[
+        'bindings/python/tree_sitter_move_on_aptos/binding.c',
         'src/parser.c',
         'src/scanner.c',
     ],
