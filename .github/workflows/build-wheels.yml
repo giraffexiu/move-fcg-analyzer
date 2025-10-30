@@ -36,7 +36,7 @@ jobs:
           CIBW_BEFORE_BUILD: pip install setuptools wheel
           # Run simple import test after build
           CIBW_TEST_REQUIRES: tree-sitter
-          CIBW_TEST_COMMAND: python -c "import tree_sitter_move_on_aptos; import move_fcg_analyzer; print('✅ Import successful')"
+          CIBW_TEST_COMMAND: python -c "import tree_sitter_move_on_aptos; import move_fcg_analyzer; print('Import successful')"
           # Increase build verbosity to see errors
           CIBW_BUILD_VERBOSITY: 1
       
