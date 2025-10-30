@@ -46,6 +46,11 @@ jobs:
       - name: Build TypeScript indexer
         run: npm run build:indexer
       
+      - name: Copy dist to package directory
+        run: |
+          rm -rf move_fcg_analyzer/dist
+          cp -r dist move_fcg_analyzer/dist
+      
       - name: Install cibuildwheel
         run: pip install cibuildwheel
       
@@ -105,6 +110,11 @@ jobs:
       
       - name: Build TypeScript indexer
         run: npm run build:indexer
+      
+      - name: Copy dist to package directory
+        run: |
+          rm -rf move_fcg_analyzer/dist
+          cp -r dist move_fcg_analyzer/dist
       
       - name: Install cibuildwheel
         run: pip install cibuildwheel

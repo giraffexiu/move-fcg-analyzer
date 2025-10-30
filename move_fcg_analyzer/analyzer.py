@@ -14,29 +14,16 @@ class MoveFunctionAnalyzer:
 
     def __init__(self):
         # Find the CLI path (TypeScript implementation)
-        # The cli.js is in the project root's dist/src/ directory
-        project_root = Path(__file__).parent.parent
-        self._cli_path = project_root / "dist" / "src" / "cli.js"
+        # When installed as a package, dist/ is included in the package directory
+        package_dir = Path(__file__).parent
+        self._cli_path = package_dir / "dist" / "src" / "cli.js"
         
         if not self._cli_path.exists():
-            # Try to build it
-            self._build_indexer(project_root)
-
-    def _build_indexer(self, project_root):
-        """Build the TypeScript indexer if not already built"""
-        try:
-            # Run npm run build:indexer
-            subprocess.run(
-                ["npm", "run", "build:indexer"],
-                cwd=project_root,
-                check=True,
-                capture_output=True,
-                text=True
+            raise RuntimeError(
+                f"TypeScript indexer not found at {self._cli_path}. "
+                "The package may not have been built correctly. "
+                "Please reinstall the package or build from source."
             )
-        except subprocess.CalledProcessError as e:
-            raise RuntimeError(f"Failed to build TypeScript indexer: {e.stderr}")
-        except FileNotFoundError:
-            raise RuntimeError("npm not found. Please install Node.js and npm.")
 
     def analyze_raw(self, project_path: str, function_name: str):
         """Index the project and query a function, returning JSON dict or None."""

@@ -24,6 +24,9 @@ recursive-include indexer *.ts *.json
 # Include compiled TypeScript output (dist/)
 recursive-include dist *.js *.d.ts *.map
 
+# Include compiled TypeScript in package directory
+recursive-include move_fcg_analyzer/dist *.js *.d.ts *.map
+
 # Include Python bindings
 recursive-include bindings/python/tree_sitter_move_on_aptos *.py *.pyi *.c
 include bindings/python/tree_sitter_move_on_aptos/py.typed
