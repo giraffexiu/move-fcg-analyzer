@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "move-fcg-analyzer"
-version = "1.0.8"
+version = "1.0.9"
 description = "Move 项目索引与函数调用图分析的轻量 Python 库"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -32,7 +32,15 @@ skip = "pp*"
 # Set build verbosity for debugging
 build-verbosity = 1
 
-# Support musllinux for broader Linux compatibility
+# Linux platform configuration
 [tool.cibuildwheel.linux]
+# Build for x86_64 architecture with manylinux and musllinux support
+# manylinux provides broad compatibility with most Linux distributions
+# musllinux provides compatibility with Alpine and other musl-based systems
+archs = ["x86_64"]
 musllinux-x86_64-image = "musllinux_1_1"
-musllinux-aarch64-image = "musllinux_1_1"
+
+# macOS platform configuration
+[tool.cibuildwheel.macos]
+# Build for both Intel (x86_64) and Apple Silicon (arm64) architectures
+archs = ["x86_64", "arm64"]

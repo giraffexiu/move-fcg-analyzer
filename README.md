@@ -1,8 +1,6 @@
 # Move FCG Analyzer
 
 [![PyPI version](https://badge.fury.io/py/move-fcg-analyzer.svg)](https://badge.fury.io/py/move-fcg-analyzer)
-[![PyPI Publish](https://github.com/YOUR_USERNAME/move-fcg-analyzer/actions/workflows/publish-to-pypi.yml/badge.svg)](https://github.com/YOUR_USERNAME/move-fcg-analyzer/actions/workflows/publish-to-pypi.yml)
-[![Test Build](https://github.com/YOUR_USERNAME/move-fcg-analyzer/actions/workflows/test-build.yml/badge.svg)](https://github.com/YOUR_USERNAME/move-fcg-analyzer/actions/workflows/test-build.yml)
 
 一个用于分析 Move 项目的静态分析工具，支持函数调用图（Function Call Graph）分析，可以提取函数信息、调用关系、参数等。
 

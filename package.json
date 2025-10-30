@@ -1,6 +1,6 @@
 {
   "name": "move-fcg-analyzer",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "A tree sitter parser for Move language with function call graph analysis.",
   "main": "index.js",
   "types": "bindings/node",

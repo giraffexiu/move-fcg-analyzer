@@ -18,7 +18,8 @@ class TreeSitterBuildExt(build_ext):
         """
         Run the build process.
         Note: tree-sitter generate and TypeScript compilation
-        are handled by CIBW_BEFORE_BUILD in CI/CD.
+        should be completed before running this build step.
+        See build_linux.sh or build_macos.sh for the complete build workflow.
         """
         super().run()
         
