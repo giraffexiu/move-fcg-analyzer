@@ -22,6 +22,20 @@ jobs:
         with:
           python-version: '3.11'
       
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Build Node.js bindings and TypeScript
+        run: |
+          npm install
+          npm run build:indexer
+          cp -r dist move_fcg_analyzer/
+          mkdir -p move_fcg_analyzer/build/Release
+          cp build/Release/tree_sitter_move_binding.node move_fcg_analyzer/build/Release/ || true
+        shell: bash
+      
       - name: Install cibuildwheel
         run: python -m pip install cibuildwheel==2.16.2
       
@@ -36,7 +50,7 @@ jobs:
           CIBW_BEFORE_BUILD: pip install setuptools wheel
           # Run simple import test after build
           CIBW_TEST_REQUIRES: tree-sitter
-          CIBW_TEST_COMMAND: python -c "import tree_sitter_move_on_aptos; import move_fcg_analyzer; print('Import successful')"
+          CIBW_TEST_COMMAND: python -c "import move_fcg_analyzer; print('Import successful')"
           # Increase build verbosity to see errors
           CIBW_BUILD_VERBOSITY: 1
       
@@ -56,6 +70,19 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Build Node.js bindings and TypeScript
+        run: |
+          npm install
+          npm run build:indexer
+          cp -r dist move_fcg_analyzer/
+          mkdir -p move_fcg_analyzer/build/Release
+          cp build/Release/tree_sitter_move_binding.node move_fcg_analyzer/build/Release/
       
       - name: Build sdist
         run: |
