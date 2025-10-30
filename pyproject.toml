@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "move-fcg-analyzer"
-version = "1.06"
+version = "1.0.7"
 description = "Move language parser and function call graph analyzer"
 readme = "README.md"
 requires-python = ">=3.8"

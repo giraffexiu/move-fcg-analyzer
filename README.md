@@ -10,19 +10,27 @@
 - 支持模块限定的函数查询
 - 输出标准 JSON 格式
 
-## 构建
+## 安装
 
-### 1. 安装依赖
-
-```bash
-npm install
-```
-
-### 2. 构建 TypeScript Indexer
+通过 PyPI 安装（跨平台支持 Linux/macOS/Windows）：
 
 ```bash
-npm run build:indexer
+pip install move-fcg-analyzer
 ```
+
+安装完成后即可直接使用命令行工具：
+
+```bash
+move-fcg-analyzer <project_path> <function_name>
+# 或
+python -m move_fcg_analyzer <project_path> <function_name>
+```
+
+依赖说明：
+- 需要系统已安装 Node.js（建议 v18+），用于运行索引器与加载原生解析模块。
+- 解析器原生模块（`.node`）已随 wheel 打包，无需手动编译。
+
+## 使用
 
 ## 使用
 
@@ -41,12 +49,12 @@ print(result["calls"])  # 查看函数调用关系
 ### 命令行
 
 ```bash
-python3 -m move_fcg_analyzer <project_path> <function_name>
+move-fcg-analyzer <project_path> <function_name>
 ```
 
 示例：
 ```bash
-python3 -m move_fcg_analyzer ./test/caas-framework grant_read_authorization
+move-fcg-analyzer ./test/caas-framework grant_read_authorization
 ```
 
 ## 输出格式
@@ -77,3 +85,16 @@ python3 -m move_fcg_analyzer ./test/caas-framework grant_read_authorization
 ## License
 
 Apache-2.0
+
+---
+
+## 开发构建（贡献者）
+
+如需本地开发或调试 TypeScript 索引器：
+
+```bash
+npm install
+npm run build:indexer
+```
+
+构建后生成的 JS 会位于 `dist/src/`；发布流程会在 CI 中自动构建并将 `dist` 与原生模块一并打包到 Python wheel。

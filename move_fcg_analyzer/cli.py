@@ -33,7 +33,7 @@ Examples:
     parser.add_argument(
         "--version",
         action="version",
-        version="move-fcg-analyzer 1.06"
+        version="move-fcg-analyzer 1.0.7"
     )
     
     args = parser.parse_args()

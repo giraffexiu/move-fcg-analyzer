@@ -31,8 +31,8 @@ __pycache__/
 .coverage
 htmlcov/
 
-# But include package dist (not build, it's platform-specific)
-!move_fcg_analyzer/dist/
+# Do not track package dist outputs; they are generated in CI
+# move_fcg_analyzer/dist/
 
 # C artifacts
 *.a
