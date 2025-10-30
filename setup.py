@@ -24,23 +24,16 @@ class TreeSitterBuildExt(build_ext):
 extra_compile_args = []
 extra_link_args = []
 
-if sys.platform == 'win32':
-    # Windows (MSVC)
-    # MSVC doesn't have /std:c11, use /TC for C compilation
-    extra_compile_args = [
-        '/TC',  # Compile as C code
-    ]
-else:
-    # Unix-like systems (GCC/Clang)
-    extra_compile_args = [
-        '-std=c11',
-        '-fPIC',
-    ]
-    if sys.platform == 'darwin':
-        # macOS specific flags
-        extra_compile_args.extend([
-            '-Wno-unused-variable',
-        ])
+# Unix-like systems (GCC/Clang)
+extra_compile_args = [
+    '-std=c11',
+    '-fPIC',
+]
+if sys.platform == 'darwin':
+    # macOS specific flags
+    extra_compile_args.extend([
+        '-Wno-unused-variable',
+    ])
 
 # Define the C extension for tree-sitter Move parser
 tree_sitter_move = Extension(
