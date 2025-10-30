@@ -68,7 +68,7 @@ jobs:
           CIBW_ARCHS_LINUX: "x86_64"
           CIBW_MANYLINUX_X86_64_IMAGE: "quay.io/pypa/manylinux_2_28_x86_64:latest"
           CIBW_MUSLLINUX_X86_64_IMAGE: "musllinux_1_1"
-          CIBW_REPAIR_WHEEL_COMMAND_LINUX: "pip install wheel && python -m wheel tags --platform-tag manylinux_2_28_x86_64 --remove {wheel} && mv *-manylinux_2_28_x86_64.whl {dest_dir}/"
+          CIBW_REPAIR_WHEEL_COMMAND_LINUX: "pip install wheel && cd $(dirname {wheel}) && python -m wheel tags --platform-tag manylinux_2_28_x86_64 --remove $(basename {wheel}) && mv *-manylinux_2_28_x86_64.whl {dest_dir}/"
       
       - name: Build source distribution (sdist)
         run: |
