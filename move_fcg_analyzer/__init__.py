@@ -7,7 +7,7 @@ This is a lightweight wrapper around the TypeScript indexer.
 
 from .analyzer import MoveFunctionAnalyzer
 
-__version__ = "1.0.0"
+__version__ = "1.0.6"
 __all__ = [
     "MoveFunctionAnalyzer",
 ]
