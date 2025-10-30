@@ -12,19 +12,32 @@ class MoveFunctionAnalyzer:
         data = analyzer.analyze_raw("./path/to/project", "module::function")
     """
 
-    def __init__(self):
+    def __init__(self, debug=False):
+        self.debug = debug
         # Find the CLI path (TypeScript implementation)
         # Try package location first (for pip installed package)
         package_dir = Path(__file__).parent
         self._cli_path = package_dir / "dist" / "src" / "cli.js"
+        
+        if self.debug:
+            print(f"[DEBUG] Package dir: {package_dir}")
+            print(f"[DEBUG] Looking for CLI at: {self._cli_path}")
+            print(f"[DEBUG] CLI exists: {self._cli_path.exists()}")
         
         if not self._cli_path.exists():
             # Fall back to project root (for development)
             project_root = package_dir.parent
             self._cli_path = project_root / "dist" / "src" / "cli.js"
             
+            if self.debug:
+                print(f"[DEBUG] Trying project root: {project_root}")
+                print(f"[DEBUG] CLI path: {self._cli_path}")
+                print(f"[DEBUG] CLI exists: {self._cli_path.exists()}")
+            
             if not self._cli_path.exists():
                 # Try to build it
+                if self.debug:
+                    print(f"[DEBUG] CLI not found, attempting to build...")
                 self._build_indexer(project_root)
 
     def _build_indexer(self, project_root):
@@ -46,6 +59,9 @@ class MoveFunctionAnalyzer:
     def analyze_raw(self, project_path: str, function_name: str):
         """Index the project and query a function, returning JSON dict or None."""
         try:
+            if self.debug:
+                print(f"[DEBUG] Running: node {self._cli_path} {project_path} {function_name}")
+            
             # Call the TypeScript CLI
             result = subprocess.run(
                 ["node", str(self._cli_path), project_path, function_name],
@@ -54,15 +70,24 @@ class MoveFunctionAnalyzer:
                 check=False
             )
             
+            if self.debug:
+                print(f"[DEBUG] Return code: {result.returncode}")
+                print(f"[DEBUG] Stdout: {result.stdout[:200] if result.stdout else 'empty'}")
+                print(f"[DEBUG] Stderr: {result.stderr[:200] if result.stderr else 'empty'}")
+            
             if result.returncode != 0:
                 # Function not found or error occurred
+                if self.debug:
+                    print(f"[DEBUG] Error output: {result.stderr}")
                 return None
             
             # Parse the JSON output
             return json.loads(result.stdout)
             
-        except json.JSONDecodeError:
+        except json.JSONDecodeError as e:
             # Invalid JSON output
+            if self.debug:
+                print(f"[DEBUG] JSON decode error: {e}")
             return None
         except Exception as e:
             print(f"Error calling TypeScript indexer: {e}")

@@ -1,36 +1,9 @@
-# Include C source files for compilation
-include src/parser.c
-include src/scanner.c
-include src/tree_sitter/parser.h
-include src/tree_sitter/alloc.h
-include src/tree_sitter/array.h
-
-# Include Python bindings
-include bindings/python/tree_sitter_move_on_aptos/binding.c
-include bindings/python/tree_sitter_move_on_aptos/__init__.py
-include bindings/python/tree_sitter_move_on_aptos/__init__.pyi
-include bindings/python/tree_sitter_move_on_aptos/py.typed
-
-# Include TypeScript build output (for CLI) - now inside move_fcg_analyzer package
-recursive-include move_fcg_analyzer/dist *.js *.d.ts
-
-# Include Node.js binding
-include move_fcg_analyzer/build/Release/*.node
-
-# Include documentation
 include README.md
 include LICENSE
-
-# Include configuration files
 include pyproject.toml
-include setup.py
-
-# Exclude unnecessary files
-global-exclude *.pyc
-global-exclude __pycache__
-global-exclude .DS_Store
-global-exclude *.map
+recursive-include move_fcg_analyzer/dist *.js *.d.ts *.map
+recursive-include move_fcg_analyzer/build/Release *.node
 prune node_modules
-prune test
 prune .git
-prune .github
+prune build
+prune dist
