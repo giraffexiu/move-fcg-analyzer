@@ -14,13 +14,18 @@ class MoveFunctionAnalyzer:
 
     def __init__(self):
         # Find the CLI path (TypeScript implementation)
-        # The cli.js is in the project root's dist/src/ directory
-        project_root = Path(__file__).parent.parent
-        self._cli_path = project_root / "dist" / "src" / "cli.js"
+        # Try package location first (for pip installed package)
+        package_dir = Path(__file__).parent
+        self._cli_path = package_dir / "dist" / "src" / "cli.js"
         
         if not self._cli_path.exists():
-            # Try to build it
-            self._build_indexer(project_root)
+            # Fall back to project root (for development)
+            project_root = package_dir.parent
+            self._cli_path = project_root / "dist" / "src" / "cli.js"
+            
+            if not self._cli_path.exists():
+                # Try to build it
+                self._build_indexer(project_root)
 
     def _build_indexer(self, project_root):
         """Build the TypeScript indexer if not already built"""

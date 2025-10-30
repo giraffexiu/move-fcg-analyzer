@@ -44,6 +44,12 @@ setup(
     },
     package_data={
         'tree_sitter_move_on_aptos': ['*.pyi', 'py.typed'],
-        'move_fcg_analyzer': ['py.typed'],
+        'move_fcg_analyzer': [
+            'py.typed',
+            'dist/src/*.js',
+            'dist/src/*.d.ts',
+            'build/Release/*.node',
+        ],
     },
+    include_package_data=True,
 )
