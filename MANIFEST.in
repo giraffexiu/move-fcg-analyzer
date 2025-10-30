@@ -1,0 +1,42 @@
+# Include documentation and license
+include README.md
+include LICENSE
+
+# Include project configuration files
+include pyproject.toml
+include setup.py
+include package.json
+include package-lock.json
+include tsconfig.json
+include eslint.config.mjs
+include .prettierrc.json
+
+# Include tree-sitter grammar and binding files
+include grammar.js
+include binding.gyp
+
+# Include all C source files for tree-sitter parser
+recursive-include src *.c *.h
+
+# Include TypeScript source files
+recursive-include indexer *.ts *.json
+
+# Include compiled TypeScript output (dist/)
+recursive-include dist *.js *.d.ts *.map
+
+# Include Python bindings
+recursive-include bindings *.py *.ts
+
+# Exclude unnecessary files
+global-exclude __pycache__
+global-exclude *.py[co]
+global-exclude .DS_Store
+global-exclude *.swp
+global-exclude *.swo
+
+# Exclude build artifacts
+prune build
+prune node_modules
+prune .git
+prune .github
+prune test

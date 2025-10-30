@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=45", "wheel"]
+requires = ["setuptools>=45", "wheel", "setuptools-scm>=6.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -14,3 +14,22 @@ dependencies = [
 
 [project.scripts]
 move-fcg-analyzer = "move_fcg_analyzer.cli:main"
+
+[tool.cibuildwheel]
+# Build for CPython 3.8 through 3.12
+build = "cp38-* cp39-* cp310-* cp311-* cp312-*"
+
+# Skip PyPy builds (not needed for this project)
+skip = "pp*"
+
+# Commands to run before building each wheel
+# Generate tree-sitter parser and build TypeScript indexer
+before-build = "tree-sitter generate && npm run build:indexer"
+
+# Set build verbosity for debugging
+build-verbosity = 1
+
+# Support musllinux for broader Linux compatibility
+[tool.cibuildwheel.linux]
+musllinux-x86_64-image = "musllinux_1_1"
+musllinux-aarch64-image = "musllinux_1_1"

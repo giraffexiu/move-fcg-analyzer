@@ -1,0 +1,235 @@
+name: Publish to PyPI
+
+# Subtask 2.1: Configure workflow triggers
+on:
+  # Trigger on version tags (v*.*.*)
+  push:
+    tags:
+      - 'v*.*.*'
+  # Allow manual trigger
+  workflow_dispatch:
+
+jobs:
+  # Subtask 2.2: Linux build job
+  build-linux:
+    name: Build wheels for Linux
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Node.js 22.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+      
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      
+      - name: Install system dependencies (gcc)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential
+      
+      - name: Install tree-sitter-cli
+        run: npm install -g tree-sitter-cli
+      
+      - name: Install npm dependencies
+        run: npm install
+      
+      - name: Generate tree-sitter parser
+        run: tree-sitter generate
+      
+      - name: Build TypeScript indexer
+        run: npm run build:indexer
+      
+      - name: Install cibuildwheel
+        run: pip install cibuildwheel
+      
+      - name: Build wheels with cibuildwheel (including musllinux)
+        run: cibuildwheel --output-dir wheelhouse
+        env:
+          CIBW_BUILD: "cp38-* cp39-* cp310-* cp311-* cp312-*"
+          CIBW_SKIP: "pp*"
+          CIBW_BEFORE_BUILD: "tree-sitter generate && npm run build:indexer"
+          CIBW_BUILD_VERBOSITY: 1
+          CIBW_MUSLLINUX_X86_64_IMAGE: "musllinux_1_1"
+          CIBW_MUSLLINUX_AARCH64_IMAGE: "musllinux_1_1"
+      
+      - name: Build source distribution (sdist)
+        run: |
+          pip install build
+          python -m build --sdist --outdir dist/
+      
+      - name: Upload Linux wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-linux
+          path: wheelhouse/*.whl
+      
+      - name: Upload source distribution
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdist
+          path: dist/*.tar.gz
+
+  # Subtask 2.3: macOS build job
+  build-macos:
+    name: Build wheels for macOS
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Node.js 22.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+      
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      
+      - name: Install tree-sitter-cli
+        run: npm install -g tree-sitter-cli
+      
+      - name: Install npm dependencies
+        run: npm install
+      
+      - name: Generate tree-sitter parser
+        run: tree-sitter generate
+      
+      - name: Build TypeScript indexer
+        run: npm run build:indexer
+      
+      - name: Install cibuildwheel
+        run: pip install cibuildwheel
+      
+      - name: Build wheels with cibuildwheel
+        run: cibuildwheel --output-dir wheelhouse
+        env:
+          CIBW_BUILD: "cp38-* cp39-* cp310-* cp311-* cp312-*"
+          CIBW_SKIP: "pp*"
+          CIBW_BEFORE_BUILD: "tree-sitter generate && npm run build:indexer"
+          CIBW_BUILD_VERBOSITY: 1
+      
+      - name: Upload macOS wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-macos
+          path: wheelhouse/*.whl
+
+  # Subtask 2.4: Windows build job
+  build-windows:
+    name: Build wheels for Windows
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Node.js 22.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+      
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      
+      - name: Configure MSVC environment
+        uses: ilammy/msvc-dev-cmd@v1
+      
+      - name: Install tree-sitter-cli
+        run: npm install -g tree-sitter-cli
+      
+      - name: Install npm dependencies
+        run: npm install
+      
+      - name: Generate tree-sitter parser
+        run: tree-sitter generate
+      
+      - name: Build TypeScript indexer
+        run: npm run build:indexer
+      
+      - name: Install cibuildwheel
+        run: pip install cibuildwheel
+      
+      - name: Build wheels with cibuildwheel
+        run: cibuildwheel --output-dir wheelhouse
+        env:
+          CIBW_BUILD: "cp38-* cp39-* cp310-* cp311-* cp312-*"
+          CIBW_SKIP: "pp*"
+          CIBW_BEFORE_BUILD: "tree-sitter generate && npm run build:indexer"
+          CIBW_BUILD_VERBOSITY: 1
+      
+      - name: Upload Windows wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-windows
+          path: wheelhouse/*.whl
+
+  # Subtask 2.5: Publish job
+  publish:
+    name: Publish to PyPI
+    needs: [build-linux, build-macos, build-windows]
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Download Linux wheels
+        uses: actions/download-artifact@v4
+        with:
+          name: wheels-linux
+          path: dist-linux
+      
+      - name: Download macOS wheels
+        uses: actions/download-artifact@v4
+        with:
+          name: wheels-macos
+          path: dist-macos
+      
+      - name: Download Windows wheels
+        uses: actions/download-artifact@v4
+        with:
+          name: wheels-windows
+          path: dist-windows
+      
+      - name: Download source distribution
+        uses: actions/download-artifact@v4
+        with:
+          name: sdist
+          path: dist-sdist
+      
+      - name: Merge all distributions
+        run: |
+          mkdir -p dist
+          cp dist-linux/* dist/ 2>/dev/null || true
+          cp dist-macos/* dist/ 2>/dev/null || true
+          cp dist-windows/* dist/ 2>/dev/null || true
+          cp dist-sdist/* dist/ 2>/dev/null || true
+      
+      - name: List all files for verification
+        run: |
+          echo "=== Contents of dist directory ==="
+          ls -lh dist/
+          echo ""
+          echo "=== File count by type ==="
+          echo "Linux wheels: $(ls dist/*manylinux*.whl dist/*musllinux*.whl 2>/dev/null | wc -l)"
+          echo "macOS wheels: $(ls dist/*macosx*.whl 2>/dev/null | wc -l)"
+          echo "Windows wheels: $(ls dist/*win*.whl 2>/dev/null | wc -l)"
+          echo "Source distributions: $(ls dist/*.tar.gz 2>/dev/null | wc -l)"
+          echo ""
+          echo "Total wheels: $(ls dist/*.whl 2>/dev/null | wc -l)"
+          echo "Total files: $(ls dist/* 2>/dev/null | wc -l)"
+      
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          verbose: true
