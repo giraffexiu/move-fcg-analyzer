@@ -43,13 +43,18 @@ jobs:
       - name: Generate tree-sitter parser
         run: tree-sitter generate
       
+      - name: Build Node.js native binding
+        run: npx node-gyp rebuild
+      
       - name: Build TypeScript indexer
         run: npm run build:indexer
       
-      - name: Copy dist to package directory
+      - name: Copy dist and native binding to package directory
         run: |
           rm -rf move_fcg_analyzer/dist
           cp -r dist move_fcg_analyzer/dist
+          mkdir -p move_fcg_analyzer/build/Release
+          cp build/Release/tree_sitter_move_binding.node move_fcg_analyzer/build/Release/
       
       - name: Install cibuildwheel
         run: pip install cibuildwheel
@@ -108,13 +113,18 @@ jobs:
       - name: Generate tree-sitter parser
         run: tree-sitter generate
       
+      - name: Build Node.js native binding
+        run: npx node-gyp rebuild
+      
       - name: Build TypeScript indexer
         run: npm run build:indexer
       
-      - name: Copy dist to package directory
+      - name: Copy dist and native binding to package directory
         run: |
           rm -rf move_fcg_analyzer/dist
           cp -r dist move_fcg_analyzer/dist
+          mkdir -p move_fcg_analyzer/build/Release
+          cp build/Release/tree_sitter_move_binding.node move_fcg_analyzer/build/Release/
       
       - name: Install cibuildwheel
         run: pip install cibuildwheel

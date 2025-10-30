@@ -4,8 +4,11 @@ Setup script for move-fcg-analyzer with tree-sitter C extension support.
 
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
+from setuptools.command.build_py import build_py
 import os
 import sys
+import shutil
+from pathlib import Path
 
 
 class TreeSitterBuildExt(build_ext):
@@ -18,6 +21,39 @@ class TreeSitterBuildExt(build_ext):
         are handled by CIBW_BEFORE_BUILD in CI/CD.
         """
         super().run()
+        
+        # Copy the Node.js native binding to the package directory
+        self.copy_native_binding()
+    
+    def copy_native_binding(self):
+        """Copy tree_sitter_move_binding.node to move_fcg_analyzer/build/Release/"""
+        source = Path('build/Release/tree_sitter_move_binding.node')
+        dest_dir = Path('move_fcg_analyzer/build/Release')
+        dest = dest_dir / 'tree_sitter_move_binding.node'
+        
+        if source.exists():
+            dest_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, dest)
+            print(f"Copied {source} to {dest}")
+        else:
+            print(f"Warning: {source} not found, skipping native binding copy")
+
+
+class CustomBuildPy(build_py):
+    """Custom build_py to ensure native binding is copied."""
+    
+    def run(self):
+        super().run()
+        
+        # Also copy the native binding during build_py
+        source = Path('build/Release/tree_sitter_move_binding.node')
+        dest_dir = Path('move_fcg_analyzer/build/Release')
+        dest = dest_dir / 'tree_sitter_move_binding.node'
+        
+        if source.exists():
+            dest_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, dest)
+            print(f"Copied {source} to {dest}")
 
 
 # Platform-specific compiler flags
@@ -50,5 +86,8 @@ tree_sitter_move = Extension(
 
 setup(
     ext_modules=[tree_sitter_move],
-    cmdclass={'build_ext': TreeSitterBuildExt},
+    cmdclass={
+        'build_ext': TreeSitterBuildExt,
+        'build_py': CustomBuildPy,
+    },
 )
