@@ -22,10 +22,6 @@ build = "cp38-* cp39-* cp310-* cp311-* cp312-*"
 # Skip PyPy builds (not needed for this project)
 skip = "pp*"
 
-# Commands to run before building each wheel
-# Generate tree-sitter parser and build TypeScript indexer
-before-build = "tree-sitter generate && npm run build:indexer"
-
 # Set build verbosity for debugging
 build-verbosity = 1
 

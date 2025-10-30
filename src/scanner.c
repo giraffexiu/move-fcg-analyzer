@@ -37,7 +37,11 @@ inline static void advance(TSLexer *lexer) { lexer->advance(lexer, false); }
 
 /// @brief Skip the char, which will be treated as a whitespace character.
 /// @param lexer the lexer
+#ifdef _MSC_VER
+inline static void skip(TSLexer *lexer) { lexer->advance(lexer, true); }
+#else
 __attribute__((unused)) inline static void skip(TSLexer *lexer) { lexer->advance(lexer, true); }
+#endif
 
 /// @brief Check if the lookahead marks the end of line. EOF is not considered as EOL.
 /// @param lexer 

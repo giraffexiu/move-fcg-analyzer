@@ -54,7 +54,6 @@ jobs:
         env:
           CIBW_BUILD: "cp38-* cp39-* cp310-* cp311-* cp312-*"
           CIBW_SKIP: "pp*"
-          CIBW_BEFORE_BUILD: "tree-sitter generate && npm run build:indexer"
           CIBW_BUILD_VERBOSITY: 1
           CIBW_MUSLLINUX_X86_64_IMAGE: "musllinux_1_1"
           CIBW_MUSLLINUX_AARCH64_IMAGE: "musllinux_1_1"
@@ -115,7 +114,6 @@ jobs:
         env:
           CIBW_BUILD: "cp38-* cp39-* cp310-* cp311-* cp312-*"
           CIBW_SKIP: "pp*"
-          CIBW_BEFORE_BUILD: "tree-sitter generate && npm run build:indexer"
           CIBW_BUILD_VERBOSITY: 1
       
       - name: Upload macOS wheels
@@ -166,7 +164,6 @@ jobs:
         env:
           CIBW_BUILD: "cp38-* cp39-* cp310-* cp311-* cp312-*"
           CIBW_SKIP: "pp*"
-          CIBW_BEFORE_BUILD: "tree-sitter generate && npm run build:indexer"
           CIBW_BUILD_VERBOSITY: 1
       
       - name: Upload Windows wheels
