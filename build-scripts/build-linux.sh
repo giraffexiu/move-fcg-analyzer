@@ -22,7 +22,7 @@ fi
 
 # 3. 清理之前的Linux wheel文件
 echo "🧹 清理之前的Linux wheel文件..."
-rm -f dist/*linux*.whl
+rm -f dist/*linux*.whl dist/*manylinux*.whl
 
 # 4. 临时复制Linux配置文件为pyproject.toml
 echo "📋 准备Linux配置文件..."
@@ -59,7 +59,7 @@ if [ -z "$wheel_file" ]; then
     exit 1
 fi
 
-new_name="dist/move_fcg_analyzer-1.1.0-py3-none-linux_x86_64.whl"
+new_name="dist/move_fcg_analyzer-1.1.0-py3-none-manylinux_2_28_x86_64.whl"
 mv "$wheel_file" "$new_name"
 
 echo "✅ Linux构建完成: $new_name"

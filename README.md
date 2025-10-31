@@ -9,20 +9,43 @@
 - **准确提取函数调用关系（calls）**
 - 支持模块限定的函数查询
 - 输出标准 JSON 格式
+- 跨平台支持（macOS ARM64、Linux x86_64）
 
-## 构建
+## 安装
 
-### 1. 安装依赖
+### 从 PyPI 安装（推荐）
+
+```bash
+pip install move-fcg-analyzer
+```
+
+### 从源码构建
+
+#### 1. 安装依赖
 
 ```bash
 npm install
 ```
 
-### 2. 构建 TypeScript Indexer
+#### 2. 构建 TypeScript Indexer
 
 ```bash
 npm run build:indexer
 ```
+
+#### 3. 构建平台特定的 wheel 包
+
+**macOS (ARM64):**
+```bash
+./build-scripts/build-macos.sh
+```
+
+**Linux (x86_64):**
+```bash
+./build-scripts/build-linux.sh
+```
+
+生成的 wheel 文件将保存在 `dist/` 目录中。
 
 ## 使用
 

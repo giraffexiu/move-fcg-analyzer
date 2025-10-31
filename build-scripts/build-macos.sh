@@ -9,7 +9,7 @@ echo "🍎 开始构建 macOS arm64 版本..."
 
 # 1. 清理之前的构建文件
 echo "🧹 清理之前的构建文件..."
-rm -rf dist/*.whl
+rm -rf dist/*macos*.whl
 rm -rf build/
 rm -rf move_fcg_analyzer/dist/
 rm -rf move_fcg_analyzer/build/
@@ -66,7 +66,7 @@ if [ -z "$wheel_file" ]; then
     exit 1
 fi
 
-new_name="dist/move_fcg_analyzer-1.1.0-py3-none-macos_arm64.whl"
+new_name="dist/move_fcg_analyzer-1.1.0-py3-none-macosx_10_9_arm64.whl"
 mv "$wheel_file" "$new_name"
 
 # 6. 清理临时文件
