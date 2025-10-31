@@ -1,0 +1,47 @@
+# Multi-stage build for creating Linux wheels compatible with Ubuntu 18-24
+FROM quay.io/pypa/manylinux_2_28_x86_64:latest
+
+# Install system dependencies first
+RUN yum update -y && \
+    yum install -y git gcc gcc-c++ make curl tar xz
+
+# Install Node.js 18 (LTS) using binary distribution
+RUN curl -fsSL https://nodejs.org/dist/v18.19.0/node-v18.19.0-linux-x64.tar.xz | tar -xJ -C /usr/local --strip-components=1
+
+# Verify Node.js installation
+RUN node --version && npm --version
+
+# Set working directory
+WORKDIR /workspace
+
+# Copy package files
+COPY package.json package-lock.json ./
+COPY grammar.js binding.gyp tsconfig.json ./
+COPY src/ ./src/
+COPY indexer/ ./indexer/
+COPY bindings/ ./bindings/
+
+# Install Node.js dependencies and build TypeScript
+# Remove any existing node_modules, package-lock.json, and build directory to ensure clean install for target architecture
+RUN rm -rf node_modules package-lock.json build && \
+    npm install && \
+    npm run build:indexer
+
+# Copy Python package files
+COPY pyproject.toml MANIFEST.in ./
+COPY move_fcg_analyzer/ ./move_fcg_analyzer/
+COPY README.md LICENSE ./
+
+# Copy TypeScript compiled files, node_modules, and build directory into the package directory
+RUN cp -r dist/ move_fcg_analyzer/ && \
+    cp -r node_modules/ move_fcg_analyzer/ && \
+    cp -r build/ move_fcg_analyzer/
+
+# Build wheels for all supported Python versions (only need one since it's pure Python)
+# Use python-dist as output directory to avoid overwriting TypeScript compiled dist/
+RUN /opt/python/cp39-cp39/bin/pip install build wheel && \
+    /opt/python/cp39-cp39/bin/python -m build --wheel --outdir python-dist
+
+# Since this is a pure Python package (py3-none-any), no auditwheel repair needed
+# Just ensure the wheel is properly named
+RUN ls -la python-dist/ && ls -la dist/src/

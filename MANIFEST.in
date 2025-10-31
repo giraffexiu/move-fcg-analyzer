@@ -1,0 +1,27 @@
+# Include all necessary files for the package to work
+include README.md
+include LICENSE
+include package.json
+include package-lock.json
+include grammar.js
+include binding.gyp
+include tsconfig.json
+
+# Include all source files
+recursive-include src *
+recursive-include dist *
+recursive-include bindings *
+recursive-include move_fcg_analyzer *
+
+# Include node_modules (needed for runtime)
+recursive-include node_modules *
+
+# Exclude unnecessary files
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude *.pyd
+global-exclude __pycache__
+global-exclude .git*
+global-exclude .DS_Store
+global-exclude *.so
+global-exclude *.dylib

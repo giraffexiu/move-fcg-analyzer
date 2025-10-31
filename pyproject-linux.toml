@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "move-fcg-analyzer"
+version = "1.1.0"
+description = "Move 项目索引与函数调用图分析的轻量 Python 库"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+  "tree-sitter>=0.20.0",
+]
+authors = [
+    {name = "ArArgon", email = "liaozping@gmail.com"}
+]
+license = {text = "Apache-2.0"}
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: POSIX :: Linux",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.scripts]
+move-fcg-analyzer = "move_fcg_analyzer.cli:main"
+
+[tool.setuptools]
+packages = ["move_fcg_analyzer"]
+
+[tool.setuptools.package-data]
+# Linux构建配置：使用Docker环境中的文件路径
+# Docker构建时，项目根目录的dist会被包含，build和node_modules在容器内重新生成
+move_fcg_analyzer = [
+    "../dist/**/*",     # 项目根目录的TypeScript编译文件
+    "build/**/*",       # x86_64 native bindings（Docker内构建）
+    "node_modules/**/*" # npm依赖（Docker内重新安装）
+]

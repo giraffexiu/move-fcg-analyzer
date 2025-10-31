@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "move-fcg-analyzer"
+version = "1.1.0"
+description = "Move 项目索引与函数调用图分析的轻量 Python 库"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+  "tree-sitter>=0.20.0",
+]
+authors = [
+    {name = "ArArgon", email = "liaozping@gmail.com"}
+]
+license = {text = "Apache-2.0"}
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: MacOS",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.scripts]
+move-fcg-analyzer = "move_fcg_analyzer.cli:main"
+
+[tool.setuptools]
+packages = ["move_fcg_analyzer"]
+
+[tool.setuptools.package-data]
+# macOS构建配置：使用复制到包目录内的文件
+# 构建脚本会将dist、build、node_modules复制到move_fcg_analyzer/目录下
+move_fcg_analyzer = [
+    "dist/**/*",        # TypeScript编译文件（复制到包目录）
+    "build/**/*",       # arm64 native bindings（本地构建）
+    "node_modules/**/*" # npm依赖（本地安装）
+]
