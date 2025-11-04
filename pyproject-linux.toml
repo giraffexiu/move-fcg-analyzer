@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "move-fcg-analyzer"
-version = "1.1.0"
+version = "1.1.1"
 description = "Move 项目索引与函数调用图分析的轻量 Python 库"
 readme = "README.md"
 requires-python = ">=3.8"

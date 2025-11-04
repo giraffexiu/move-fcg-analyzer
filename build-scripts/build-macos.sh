@@ -7,6 +7,12 @@ set -e  # 遇到错误立即退出
 
 echo "🍎 开始构建 macOS arm64 版本..."
 
+# 切换到项目根目录（脚本所在目录的上一级）
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+cd "$PROJECT_ROOT"
+echo "🔧 工作目录: $PROJECT_ROOT"
+
 # 1. 清理之前的构建文件
 echo "🧹 清理之前的构建文件..."
 rm -rf dist/*macos*.whl
@@ -66,7 +72,7 @@ if [ -z "$wheel_file" ]; then
     exit 1
 fi
 
-new_name="dist/move_fcg_analyzer-1.1.0-py3-none-macosx_10_9_arm64.whl"
+new_name="dist/move_fcg_analyzer-1.1.1-1-py3-none-macosx_11_0_arm64.whl"
 mv "$wheel_file" "$new_name"
 
 # 6. 清理临时文件

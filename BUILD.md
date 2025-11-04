@@ -28,7 +28,7 @@
 2. 运行 `npm install` 和 `npm run build:indexer`
 3. 复制 `dist`、`build`、`node_modules` 到包目录
 4. 使用 `pyproject-macos.toml` 构建wheel
-5. 重命名为 `move_fcg_analyzer-1.1.0-py3-none-macos_arm64.whl`
+5. 重命名为 `move_fcg_analyzer-1.1.1-py3-none-macosx_11_0_arm64.whl`
 
 ### Linux x86_64 构建
 
@@ -42,7 +42,7 @@
 1. 检查Docker环境
 2. 构建Docker镜像
 3. 在容器中使用 `pyproject-linux.toml` 构建wheel
-4. 提取并重命名为 `move_fcg_analyzer-1.1.0-py3-none-linux_x86_64.whl`
+4. 提取并重命名为 `move_fcg_analyzer-1.1.1-py3-none-manylinux_2_28_x86_64.whl`
 
 ### 构建所有平台
 
@@ -66,17 +66,17 @@
 
 构建完成后，wheel文件将保存在 `dist/` 目录：
 
-- `move_fcg_analyzer-1.1.0-py3-none-macos_arm64.whl` - macOS版本
-- `move_fcg_analyzer-1.1.0-py3-none-linux_x86_64.whl` - Linux版本
+- `move_fcg_analyzer-1.1.1-py3-none-macosx_11_0_arm64.whl` - macOS (arm64) 版本
+- `move_fcg_analyzer-1.1.1-py3-none-manylinux_2_28_x86_64.whl` - Linux (x86_64) 版本
 
 ## 安装测试
 
 ```bash
 # 安装macOS版本
-pip install dist/move_fcg_analyzer-1.1.0-py3-none-macos_arm64.whl
+pip install dist/move_fcg_analyzer-1.1.1-py3-none-macosx_11_0_arm64.whl
 
 # 安装Linux版本
-pip install dist/move_fcg_analyzer-1.1.0-py3-none-linux_x86_64.whl
+pip install dist/move_fcg_analyzer-1.1.1-py3-none-manylinux_2_28_x86_64.whl
 ```
 
 ## 依赖要求

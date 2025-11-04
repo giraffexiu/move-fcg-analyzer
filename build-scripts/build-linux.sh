@@ -59,7 +59,7 @@ if [ -z "$wheel_file" ]; then
     exit 1
 fi
 
-new_name="dist/move_fcg_analyzer-1.1.0-py3-none-manylinux_2_28_x86_64.whl"
+new_name="dist/move_fcg_analyzer-1.1.1-py3-none-manylinux_2_28_x86_64.whl"
 mv "$wheel_file" "$new_name"
 
 echo "✅ Linux构建完成: $new_name"
